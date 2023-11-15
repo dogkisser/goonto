@@ -1,0 +1,45 @@
+[package]
+name = "goonto"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+futures = "0.3"
+tokio = "1.33.0"
+anyhow = "1.0.75"
+clap = { version = "4.4.7", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.108"
+rand = "0.8.5"
+directories = "5.0.1"
+notify-rust = "4"
+enigo = "0.1.3"
+fltk = { version = "1.4.16", features = ["no-pango"] }
+# I don't THINK FLTK has a way to do this
+global-hotkey = "0.4.0"
+
+[dependencies.reqwest]
+version = "0.11"
+default-features = false
+features = ["blocking", "rustls-tls", "json", "stream"]
+
+# [dependencies.zip]
+# version = "0.6.6"
+# features = ["zstd"]
+# default-features = false
+
+[target.'cfg(unix)'.dependencies]
+x11 = "2.21.0"
+
+[target.'cfg(windows)'.dependencies.fltk]
+version = "1.4.16"
+features = ["fltk-bundled"]
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3.9", features = ["std", "winuser"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
