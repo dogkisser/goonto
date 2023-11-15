@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goonto</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    window.onload = async () => {
+        let dl_modal = document.getElementById('cum-now-modal');
+        let cum_now_link = document.getElementById('cum-now');
+        let release_link = document.getElementById('release-url');
+
+        cum_now_link.onclick = (_e) => {
+            dl_modal.classList.remove('hidden');
+        };
+
+        let all_releases_ = await fetch('https://api.github.com/repos/zoomasochist/goonto/releases');
+        let all_releases = await all_releases_.json();
+        
+        let latest_rel = all_releases[0];
+        
+        let release_name = latest_rel['name'];
+        let release_url  = latest_rel['html_url'];
+        let release_elf  = latest_rel['assets']
+            .find(e => e['name'] == 'goonto')['browser_download_url'];
+        let release_exe  = latest_rel['assets']
+            .find(e => e['name'].endsWith('.exe'))['browser_download_url'];
+
+        console.log(window.navigator.platform);
+
+        release_link.href = release_url;
+        release_link.innerText = release_name;
+        if (['Windows', 'Win32', 'Win64'].indexOf(window.navigator.platform) != -1) {
+            cum_now_link.href = release_exe;
+        } else {
+            cum_now_link.href = release_elf;
+        }
+    };
+    </script>
+</head>
+<body class="w-screen h-screen">
+    <div id="cum-now-modal"
+        class="absolute flex hidden z-10 w-screen h-screen bg-[#000000AA] items-center justify-center">
+        <div class="bg-[#DDDAEC] w-3/5 flex flex-col items-center">
+            <h1 class="text-7xl text-[#54487A] font-bold pt-12 pb-2">Nice work!</h1>
+            <p class="text-xl text-center leading-6">
+                When your download is complete, just click on the binary to get started.<br>
+                No setup necessary!
+            </p>
+
+            <h2 class="pt-12 text-6xl">The exit hotkey is <b>Control + Backspace</b>.</h2>
+
+            <button class="text-[#54487A] font-bold text-3xl bg-[#DFF0D8] mt-32 py-5 px-10 mb-12
+                drop-shadow-[3px_3px_0_rgba(255,255,255,.3)] 
+                hover:drop-shadow-[5px_5px_0_rgba(255,255,255,.3)]
+                hover:bg-[#D0E9C5] cursor-pointer"
+                onclick="document.getElementById('cum-now-modal').classList.add('hidden')"
+            >
+                Thanks!
+            </button>
+        </div>
+    </div>
+
+    <header class="h-max flex flex-col md:flex-row">
+        <div
+            class="bg-[#54487A] grow font-bold text-8xl pt-32 flex flex-col gap-28 pb-32"
+        >
+            <h1 class="text-[#DDDAEC] pr-3 self-end">Stroke your dick</h1>
+            
+            <div class="flex flex-col">
+                <a id="cum-now"
+                    class="text-[#54487A] bg-[#DFF0D8] py-5 px-10 self-center text-7xl transition
+                        drop-shadow-[3px_3px_0_rgba(255,255,255,.3)] 
+                        hover:drop-shadow-[5px_5px_0_rgba(255,255,255,.3)]
+                        hover:bg-[#D0E9C5] cursor-pointer">
+                    Cum Now!
+                </a>
+
+                <p class="text-sm self-center text-white">
+                    Release
+                    <a id="release-url" class="text-[#DFF0D8] cursor-pointer">(loading release..)</a> —
+                    <a href="https://github.com/zoomasochist/goonto/releases" class="text-[#DFF0D8] cursor-pointer">
+                        see all releases
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <div
+            class="bg-[#DDDAEC] grow font-bold text-8xl pt-32 flex flex-col gap-28"
+        >
+            <h1 class="text-[#54487A] pl-3">in one click.™</h1>
+
+            <p class="text-5xl self-center text-[#54487A]">
+                No configuration.<br>
+                No dependencies.<br>
+                No pack hunting.<br>
+            </p>
+        </div>
+    </header>
+    
+    <div class="w-screen bg-[#DFF0D8] flex flex-col">
+        <h1 class="m-32 p-5 text-[#54487A] font-bold self-center text-7xl">placeholder :)</h1>
+    </div>
+</body>
+</html>
