@@ -4,6 +4,7 @@ on:
   release:
     types: [published]
 
+
 jobs:
   build:
     name: Build
@@ -13,20 +14,26 @@ jobs:
       matrix:
         os: [ubuntu, windows]
 
-    env:
-      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+    permissions:
+      contents: write
 
-    runs-on: ${{matrix.os}}-latest
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: >
+
+      - name: install deps
+        run: >
           sudo apt-get update && sudo apt-get install --no-install-recommends -y
           cmake
           libx11-dev libxext-dev libxft-dev libxinerama-dev libxcursor-dev libxrender-dev
           libxfixes-dev libpango1.0-dev libgl1-mesa-dev libglu1-mesa-dev libxdo-dev
-      - run: cargo build --release
+        if: ${{ matrix.os != 'windows' }}
+      
+      - name: build release
+        run: cargo build --release
 
-      - uses: softprops/action-gh-release@v1
+      - name: add artifact
+        uses: softprops/action-gh-release@v1
         with:
-          files: target/release/goonto{.exe,}
+          files: target/release/goonto*(.exe)
