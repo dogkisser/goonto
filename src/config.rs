@@ -41,7 +41,7 @@ impl Config {
         // If this failed it's probably because the directory already exists, and idc about that
         let _ = std::fs::create_dir(base_dirs.home_dir().join(".config/"));
         std::fs::write(base_dirs.home_dir().join(".config/goonto.json"),
-            serde_json::to_string(&self)?)?;
+            serde_json::to_string_pretty(&self)?)?;
         Ok(())
     }
 }

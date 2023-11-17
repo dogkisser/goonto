@@ -1,7 +1,7 @@
 {
     "source_tags": [ ],
     "source_path": "test/source",
-    
+
     "popups": {
         "mitosis": {
             "chance": 50,
