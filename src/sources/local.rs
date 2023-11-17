@@ -1,7 +1,7 @@
 use std::thread;
 use std::fs::DirEntry;
 use std::sync::{Arc, Mutex};
-use rand::prelude::{IteratorRandom, SliceRandom};
+use rand::prelude::SliceRandom;
 
 use crate::sources;
 
