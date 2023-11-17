@@ -24,7 +24,7 @@ impl Default for Web {
     fn default() -> Self {
         Self {
             enabled: false,
-            rate: 10_000,
+            rate: 20_000,
         }
     }
 }

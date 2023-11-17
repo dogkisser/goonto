@@ -18,6 +18,12 @@ fn dialog(msg: &str) {
 }
 
 fn main() {
+    let singleton = single_instance::SingleInstance::new("zoomasochist-goonto").unwrap();
+    if !singleton.is_single() {
+        dialog("Goonto is already running.");
+        return
+    }
+
     if let Err(_) = Config::load() {
         if let Err(e) = Config::default().save() {
             dialog(&format!("Failed to create default config file: {:?}", e));

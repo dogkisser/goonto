@@ -26,7 +26,7 @@ impl Default for Typing {
     fn default() -> Self {
         Self {
             enabled: true,
-            rate: 10_000,
+            rate: 30_000,
         }
     }
 }

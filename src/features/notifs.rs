@@ -33,7 +33,7 @@ impl Default for Notifs {
     fn default() -> Self {
         Self {
             enabled: true,
-            rate: 5_000,
+            rate: 15_000,
             close_automatically: true,
         }
     }
