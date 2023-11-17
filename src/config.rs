@@ -9,6 +9,7 @@ use crate::features::*;
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Config {
     pub source_tags: Vec<String>,
+    pub source_path: String,
     pub popups: Popups,
     pub web: Web,
     pub notifs: Notifs,
@@ -37,7 +38,8 @@ impl Config {
     pub fn save(&self) -> Result<()> {
         let base_dirs = BaseDirs::new().unwrap();
 
-        std::fs::create_dir(base_dirs.home_dir().join(".config/"));
+        // If this failed it's probably because the directory already exists, and idc about that
+        let _ = std::fs::create_dir(base_dirs.home_dir().join(".config/"));
         std::fs::write(base_dirs.home_dir().join(".config/goonto.json"),
             serde_json::to_string(&self)?)?;
         Ok(())

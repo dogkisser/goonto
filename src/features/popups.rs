@@ -19,7 +19,7 @@ pub struct Mitosis {
 }
 
 impl Popups {
-    pub fn run(self, source: Rc<crate::source::Source>) {
+    pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {
         let rate = self.rate as f64 / 1000.;
 
         app::add_timeout3(rate, move |handle| {
@@ -46,7 +46,7 @@ impl Default for Popups {
 }
 
 /* Returns the number of new popups to create immediately */
-fn new_popup(handle: *mut (), source: Rc<crate::source::Source>, cfg: Popups)
+fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), source: Rc<T>, cfg: Popups)
     -> anyhow::Result<()>
 {
     let image_path = source.image();

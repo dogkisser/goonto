@@ -1,5 +1,6 @@
 {
     "source_tags": [ ],
+    "source_path": "test/source",
     
     "popups": {
         "mitosis": {
@@ -15,7 +16,7 @@
         "closable": true
     },
     "notifs": {
-        "enabled": false,
+        "enabled": true,
         "rate": 1000,
         "close_automatically": true
     },

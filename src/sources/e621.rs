@@ -6,11 +6,15 @@ use std::sync::{Arc, Mutex};
 use std::path::PathBuf;
 use rand::prelude::{IteratorRandom, SliceRandom};
 use serde::Deserialize;
+use futures::{stream, StreamExt};
+
+use crate::sources;
 
 #[derive(Debug)]
-pub struct Source {
+pub struct E621 {
     images: Arc<Mutex<Vec<String>>>,
     prompts: Vec<String>,
+    babble: Vec<String>,
     urls: Vec<String>,
 }
 
@@ -29,18 +33,13 @@ struct E6File {
     url: Option<String>,
 }
 
-impl Source {
+impl E621 {
     pub fn new(tags: Vec<String>, app_root: PathBuf) -> anyhow::Result<Self> {
         let r = Self {
             images: Arc::new(Mutex::new(Vec::new())),
-            prompts: vec![
-                "a".to_string(),
-                "b".to_string(),
-            ],
-            urls: vec![
-                "https://e621.net/".to_string(),
-                "https://rule34.xxx/".to_string(),
-            ],
+            prompts: sources::LOCAL_PROMPTS.iter().map(|s| String::from(*s)).collect(),
+            babble:  sources::LOCAL_BABBLE.iter().map(|s| String::from(*s)).collect(),
+            urls: sources::LOCAL_URLS.iter().map(|s| String::from(*s)).collect(),
         };
 
         let data_dir = app_root.join("cache");
@@ -53,21 +52,25 @@ impl Source {
 
         Ok(r)
     }
+}
 
-    pub fn prompt(&self) -> String {
+impl sources::Source for E621 {
+    fn prompt(&self) -> String {
         random_from(&self.prompts)
     }
 
-    pub fn image(&self) -> String {
+    fn image(&self) -> String {
         take_random(&mut self.images.lock().unwrap())
     }
+    
+    fn babble(&self) -> String {
+        random_from(&self.babble)
+    }
 
-    pub fn url(&self) -> String {
+    fn url(&self) -> String {
         random_from(&self.urls)
     }
 }
-
-use futures::{stream, StreamExt};
 
 /* TODO: hacky in general */
 fn stocktake(tags: Vec<String>, data_dir: PathBuf, images: Arc<Mutex<Vec<String>>>)
@@ -79,7 +82,7 @@ fn stocktake(tags: Vec<String>, data_dir: PathBuf, images: Arc<Mutex<Vec<String>
             continue;
         }
 
-        let mut url = "https://e621.net/posts.json?limit=25&tags=-animated rating:e order:random score:>200 "
+        let mut url = "https://e621.net/posts.json?limit=25&tags=-animated rating:e order:random score:>300 "
             .to_string();
         url.push_str(&random_from(&tags));
 

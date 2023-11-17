@@ -9,11 +9,11 @@ pub struct Clipboard {
 }
 
 impl Clipboard {
-    pub fn run(self, source: Rc<crate::source::Source>) {
+    pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {
         let rate = self.rate as f64 / 1000.;
 
         app::add_timeout3(rate, move |handle| {
-            app::copy(&source.prompt());
+            app::copy(&source.babble());
             
             app::repeat_timeout3(rate, handle);
         });

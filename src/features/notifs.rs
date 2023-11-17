@@ -10,7 +10,7 @@ pub struct Notifs {
 }
 
 impl Notifs {
-    pub fn run(self, source: Rc<crate::source::Source>) {
+    pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {
         let rate = self.rate as f64 / 1000.;
 
         app::add_timeout3(rate, move |handle| {
@@ -33,7 +33,7 @@ impl Default for Notifs {
     fn default() -> Self {
         Self {
             enabled: true,
-            rate: 3_000,
+            rate: 5_000,
             close_automatically: true,
         }
     }

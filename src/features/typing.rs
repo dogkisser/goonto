@@ -10,12 +10,12 @@ pub struct Typing {
 }
 
 impl Typing {
-    pub fn run(self, source: Rc<crate::source::Source>) {
+    pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {
         let rate = self.rate as f64 / 1000.;
         let mut enigo = Enigo::new();
 
         app::add_timeout3(rate, move |handle| {
-            enigo.key_sequence_parse(&source.prompt());
+            enigo.key_sequence_parse(&source.babble());
             
             app::repeat_timeout3(rate, handle);
         });
@@ -25,7 +25,7 @@ impl Typing {
 impl Default for Typing {
     fn default() -> Self {
         Self {
-            enabled: false,
+            enabled: true,
             rate: 10_000,
         }
     }

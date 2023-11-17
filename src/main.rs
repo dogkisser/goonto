@@ -1,24 +1,15 @@
 #![windows_subsystem = "windows"]
 use std::rc::Rc;
+use std::path::Path;
 use anyhow::anyhow;
-use clap::Parser;
-use fltk::{prelude::*, app, window::Window, group::Flex, group::Pack, frame::Frame, button::CheckButton};
-use fltk::enums::Color;
+use fltk::app;
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey, Modifiers, Code}};
 
 mod config;
-mod source;
+mod sources;
 mod features;
 use crate::config::Config;
-use crate::features::*;
-
-#[derive(Parser, Debug)]
-#[command(author, version, about)]
-struct Args {
-    /// Launch the fetish wizard and exit
-    #[arg(long)]
-    wizard: bool,
-}
+// use crate::features::*;
 
 fn dialog(msg: &str) {
     fltk::dialog::message(
@@ -27,13 +18,6 @@ fn dialog(msg: &str) {
 }
 
 fn main() {
-    let args = Args::parse();
-
-    if args.wizard {
-        wizard();
-        return
-    }
-
     if let Err(_) = Config::load() {
         if let Err(e) = Config::default().save() {
             dialog(&format!("Failed to create default config file: {:?}", e));
@@ -53,53 +37,23 @@ fn main() {
     }
 }
 
-fn wizard() {
-    // let app = app::App::default().with_scheme(app::Scheme::Gtk);
-    // app::background(255, 255, 255);
-
-    // let mut wind = Window::default()
-    //     .with_size(300, 200)
-    //     .with_label("Goonto Wizard")
-    //     .center_screen();
-    
-    // Frame::default().with_size(300, 200)
-    //     .with_label("There's nothing here yet.");
-    // let mut rows = Flex::default_fill().row().center_of_parent();
-
-    // let mut meta_row = Flex::default().column();
-    // {
-    //     Frame::default();
-
-    //     let ros = CheckButton::default().with_label("Run on startup");
-
-    //     meta_row.fixed(&ros, 80);
-    // }
-    // meta_row.end();
-
-    // col.fixed(&meta_flex, 200);
-
-    // let mut text = Frame::default()
-    //     .with_size(300, 200)
-    //     .with_label("Select things you'd like to see"); 
-
-    // rows.end();
-    // wind.end();
-    // wind.show();
-
-    // app.run().unwrap();
-}
-
 fn app() -> anyhow::Result<()> {
     let base_dirs = directories::BaseDirs::new()
         .ok_or_else(|| anyhow!("couldn't find base dirs"))?;
     let app_root = base_dirs.data_dir().join("goonto");
 
     let cfg = Config::load()?;
-    let source = Rc::new(source::Source::new(cfg.source_tags, app_root)?);
+
+    let source: Rc<dyn sources::Source> =
+        if Path::new(&cfg.source_path).exists() {
+            Rc::new(sources::Local::new(cfg.source_path)?)
+        } else {
+            Rc::new(sources::E621::new(cfg.source_tags, app_root)?)
+        };
 
     let manager = GlobalHotKeyManager::new()?;
     let hotkey = HotKey::new(Some(Modifiers::CONTROL), Code::Backspace);
-    manager.register(hotkey);
+    manager.register(hotkey)?;
 
     let _app = app::App::default();
 
@@ -125,7 +79,7 @@ fn app() -> anyhow::Result<()> {
 
     loop {
         app::wait_for(100.)?;
-        if let Ok(evt) = GlobalHotKeyEvent::receiver().try_recv() {
+        if let Ok(_) = GlobalHotKeyEvent::receiver().try_recv() {
             std::process::exit(0);
         }
     }
