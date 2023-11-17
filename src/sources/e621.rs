@@ -90,7 +90,7 @@ fn stocktake(tags: Vec<String>, data_dir: PathBuf, images: Arc<Mutex<Vec<String>
 
         let resp = client
             .get(url)
-            .header(reqwest::header::USER_AGENT, "Goonto/1.0")
+            .header(reqwest::header::USER_AGENT, "Goonto/1.0.69")
             .send()
             .await
             .unwrap()

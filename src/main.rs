@@ -9,7 +9,6 @@ mod config;
 mod sources;
 mod features;
 use crate::config::Config;
-// use crate::features::*;
 
 fn dialog(msg: &str) {
     fltk::dialog::message(
@@ -30,8 +29,7 @@ fn main() {
             return
         }
 
-        dialog("No config file was found, so a default one was created. \
-            You can use the wizard to edit it.\n");
+        dialog("No config file was found (or it was outdated), so a default one was created.\n");
     }
 
     match app() {
@@ -77,10 +75,6 @@ fn app() -> anyhow::Result<()> {
 
     if cfg.clipboard.enabled {
         cfg.clipboard.run(Rc::clone(&source));
-    }
-
-    if cfg.web.enabled {
-        cfg.web.run(Rc::clone(&source));
     }
 
     loop {

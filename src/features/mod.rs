@@ -1,5 +1,3 @@
-mod web;
-pub use web::*;
 mod popups;
 pub use popups::*;
 mod notifs;

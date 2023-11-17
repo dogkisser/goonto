@@ -11,7 +11,6 @@ pub struct Config {
     pub source_tags: Vec<String>,
     pub source_path: String,
     pub popups: Popups,
-    pub web: Web,
     pub notifs: Notifs,
     pub typing: Typing,
     pub clipboard: Clipboard,

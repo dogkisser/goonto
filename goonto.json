@@ -20,10 +20,6 @@
         "rate": 1000,
         "close_automatically": true
     },
-    "web": {
-        "enabled": false,
-        "rate": 1000
-    },
     "typing": {
         "enabled": false,
         "rate": 1000
