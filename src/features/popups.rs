@@ -70,7 +70,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), sour
 
     button.set_callback(move |w| {
         if cfg.closable {
-            /* SAFETY: I _know_ this widget has a parent */
+            /* SAFETY: I _know_ this widget has a window */
             w.window().unwrap().hide();
 
             if rand::thread_rng().gen_range(0..100) < cfg.mitosis.chance {
@@ -81,7 +81,6 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), sour
         }
     });
 
-    wind.make_modal(false);
     wind.set_border(false);
     wind.set_callback(|_| { });
     wind.end();

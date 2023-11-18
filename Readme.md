@@ -4,6 +4,8 @@
 
 - ci should really be caching
 - i bet stocktake() crashes if the network connection is dodgy
+- site is broken for the period of CI building a new release
+- limit the number of popups on screen and slowly replace them over time
 
 | **Feature**         | **Edgeware** | **Goonto** |
 | ------------------- | ------------ | ---------- |
