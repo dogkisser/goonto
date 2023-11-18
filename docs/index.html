@@ -28,8 +28,6 @@
         let release_exe  = latest_rel['assets']
             .find(e => e['name'].endsWith('.exe'))['browser_download_url'];
 
-        console.log(window.navigator.platform);
-
         release_link.href = release_url;
         release_link.innerText = release_name;
         if (['Windows', 'Win32', 'Win64'].indexOf(window.navigator.platform) != -1) {
