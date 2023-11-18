@@ -1,6 +1,6 @@
 {
     "source_tags": [ ],
-    "source_path": "test/source",
+    "source_path": "/run/media/i/545a0dac-521a-406d-ad6a-a6c26b46df3e/p",
 
     "popups": {
         "mitosis": {
@@ -16,7 +16,7 @@
         "closable": true
     },
     "notifs": {
-        "enabled": true,
+        "enabled": false,
         "rate": 1000,
         "close_automatically": true
     },
