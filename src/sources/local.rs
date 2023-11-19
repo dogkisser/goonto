@@ -9,7 +9,6 @@ pub struct Local {
     images: Arc<Mutex<Vec<String>>>,
     prompts: Vec<String>,
     babble: Vec<String>,
-    urls: Vec<String>,        
 }
 
 impl Local {
@@ -21,7 +20,6 @@ impl Local {
             images: Arc::new(Mutex::new(Vec::new())),
             prompts: sources::LOCAL_PROMPTS.iter().map(|s| String::from(*s)).collect(),
             babble:  sources::LOCAL_BABBLE.iter().map(|s| String::from(*s)).collect(),
-            urls: sources::LOCAL_URLS.iter().map(|s| String::from(*s)).collect(),
         };
 
         thread::spawn({
@@ -44,10 +42,6 @@ impl sources::Source for Local {
     
     fn babble(&self) -> String {
         random_from(&self.babble)
-    }
-
-    fn url(&self) -> String {
-        random_from(&self.urls)
     }
 }
 

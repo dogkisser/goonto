@@ -15,7 +15,6 @@ pub struct E621 {
     images: Arc<Mutex<Vec<String>>>,
     prompts: Vec<String>,
     babble: Vec<String>,
-    urls: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -38,8 +37,7 @@ impl E621 {
         let r = Self {
             images: Arc::new(Mutex::new(Vec::new())),
             prompts: sources::LOCAL_PROMPTS.iter().map(|s| String::from(*s)).collect(),
-            babble:  sources::LOCAL_BABBLE.iter().map(|s| String::from(*s)).collect(),
-            urls: sources::LOCAL_URLS.iter().map(|s| String::from(*s)).collect(),
+            babble:  sources::LOCAL_BABBLE.iter().map(|s| String::from(*s)).collect()
         };
 
         let data_dir = app_root.join("cache");
@@ -65,10 +63,6 @@ impl sources::Source for E621 {
     
     fn babble(&self) -> String {
         random_from(&self.babble)
-    }
-
-    fn url(&self) -> String {
-        random_from(&self.urls)
     }
 }
 

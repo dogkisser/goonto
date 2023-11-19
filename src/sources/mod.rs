@@ -7,7 +7,6 @@ pub trait Source: Send + Sync {
     fn image(&self) -> String;
     fn prompt(&self) -> String;
     fn babble(&self) -> String;
-    fn url(&self) -> String;
 }
 
 const LOCAL_PROMPTS: [&str; 61] = [
@@ -92,9 +91,4 @@ const LOCAL_BABBLE: [&str; 17] = [
     "I just can't quit porn... it's too good",
     "It feels so good to let go and be consumed by PORN. ",
     "My musky goonstick won't stop pumping out cummmm hhnnnngggg",
-];
-
-const LOCAL_URLS: [&str; 2] = [
-    "https://e621.net/",
-    "https://rule34.xxx/",
 ];
