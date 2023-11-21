@@ -1,8 +1,6 @@
-use std::path::Path;
 use std::fs::File;
 use serde::{Serialize, Deserialize};
-use anyhow::{anyhow, Result};
-use directories::BaseDirs;
+use anyhow::Result;
 
 use crate::features::*;
 

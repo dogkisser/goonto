@@ -1,7 +1,6 @@
 #![windows_subsystem = "windows"]
 use std::rc::Rc;
 use std::path::Path;
-use anyhow::anyhow;
 use fltk::app;
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey, Modifiers, Code}};
 
@@ -47,10 +46,6 @@ fn main() {
 }
 
 fn app() -> anyhow::Result<()> {
-    let base_dirs = directories::BaseDirs::new()
-        .ok_or_else(|| anyhow!("couldn't find base dirs"))?;
-    let app_root = base_dirs.data_dir().join("goonto");
-
     let cfg = Config::load()?;
 
     let source: Rc<dyn sources::Source> =

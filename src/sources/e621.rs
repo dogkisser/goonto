@@ -3,7 +3,7 @@ use std::io;
 use std::time::Duration;
 use std::thread;
 use std::sync::{Arc, Mutex};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use rand::prelude::{IteratorRandom, SliceRandom};
 use serde::Deserialize;
 use futures::{stream, StreamExt};
