@@ -23,13 +23,18 @@ fn main() {
         return
     }
 
-    if let Err(_) = Config::load() {
+    if let Err(e) = Config::load() {
+        if e.is::<serde_json::Error>() {
+            dialog(&format!("Couldn't parse your configuration file!\n{:?}", e));
+            return
+        }
+
         if let Err(e) = Config::default().save() {
             dialog(&format!("Failed to create default config file: {:?}", e));
             return
         }
 
-        dialog("No config file was found (or it was outdated), so a default one was created.\n");
+        dialog("No config file was found, so a default one was created.\n");
     }
 
     match app() {
