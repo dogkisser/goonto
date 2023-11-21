@@ -57,7 +57,7 @@ fn app() -> anyhow::Result<()> {
         if Path::new(&cfg.source_path).exists() {
             Rc::new(sources::Local::new(cfg.source_path)?)
         } else {
-            Rc::new(sources::E621::new(cfg.source_tags, app_root)?)
+            Rc::new(sources::E621::new(cfg.source_tags)?)
         };
 
     let manager = GlobalHotKeyManager::new()?;

@@ -3,7 +3,7 @@ use std::io;
 use std::time::Duration;
 use std::thread;
 use std::sync::{Arc, Mutex};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use rand::prelude::{IteratorRandom, SliceRandom};
 use serde::Deserialize;
 use futures::{stream, StreamExt};
@@ -33,19 +33,18 @@ struct E6File {
 }
 
 impl E621 {
-    pub fn new(tags: Vec<String>, app_root: PathBuf) -> anyhow::Result<Self> {
+    pub fn new(tags: Vec<String>) -> anyhow::Result<Self> {
         let r = Self {
             images: Arc::new(Mutex::new(Vec::new())),
             prompts: sources::LOCAL_PROMPTS.iter().map(|s| String::from(*s)).collect(),
             babble:  sources::LOCAL_BABBLE.iter().map(|s| String::from(*s)).collect()
         };
 
-        let data_dir = app_root.join("cache");
-        fs::create_dir_all(&data_dir)?;
+        let _ = fs::create_dir_all("./goonto-cache");
 
         thread::spawn({
             let clone = Arc::clone(&r.images);
-            move || { let _ = stocktake(tags, data_dir, clone); }
+            move || { let _ = stocktake(tags, clone); }
         });
 
         Ok(r)
@@ -67,7 +66,7 @@ impl sources::Source for E621 {
 }
 
 /* TODO: hacky in general */
-fn stocktake(tags: Vec<String>, data_dir: PathBuf, images: Arc<Mutex<Vec<String>>>)
+fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>)
     -> anyhow::Result<()>
 {
     tokio::runtime::Runtime::new().unwrap().block_on(async { loop {
@@ -102,7 +101,7 @@ fn stocktake(tags: Vec<String>, data_dir: PathBuf, images: Arc<Mutex<Vec<String>
             .map(|image_url| {
                 let client = &client;
                 let (_, filename) = &image_url.rsplit_once('/').unwrap();
-                let out_path = data_dir.join(filename);
+                let out_path = Path::new("./goonto-cache/").join(filename);
 
                 async move {
                     let s = client.get(&image_url)

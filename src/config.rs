@@ -17,30 +17,12 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn load() -> Result<Self> {
-        let base_dirs = BaseDirs::new().unwrap();
-
-        let possible_paths =
-            [ "./goonto.json",
-              &base_dirs.home_dir().join(".config/goonto.json").display().to_string()
-            ];
-
-        let config =
-            possible_paths
-                .iter()
-                .find(|i| Path::new(i).exists())
-                .ok_or_else(|| return anyhow!("no configuration file found"))?;
-    
-        Ok(serde_json::from_reader(File::open(config)?)?)
+    pub fn load() -> Result<Self> {    
+        Ok(serde_json::from_reader(File::open("./goonto.json")?)?)
     }
 
     pub fn save(&self) -> Result<()> {
-        let base_dirs = BaseDirs::new().unwrap();
-
-        // If this failed it's probably because the directory already exists, and idc about that
-        let _ = std::fs::create_dir(base_dirs.home_dir().join(".config/"));
-        std::fs::write(base_dirs.home_dir().join(".config/goonto.json"),
-            serde_json::to_string_pretty(&self)?)?;
+        std::fs::write("./goonto.json", serde_json::to_string_pretty(&self)?)?;
         Ok(())
     }
 }
