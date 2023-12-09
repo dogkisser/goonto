@@ -6,37 +6,6 @@
     <title>Goonto</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-    window.onload = async () => {
-        let dl_modal = document.getElementById('cum-now-modal');
-        let cum_now_link = document.getElementById('cum-now');
-        let release_link = document.getElementById('release-url');
-
-        cum_now_link.onclick = (_e) => {
-            dl_modal.classList.remove('hidden');
-        };
-
-        let all_releases_ = await fetch('https://api.github.com/repos/zoomasochist/goonto/releases');
-        let all_releases = await all_releases_.json();
-        
-        let latest_rel = all_releases[0];
-        
-        let release_name = latest_rel['name'];
-        let release_url  = latest_rel['html_url'];
-        let release_elf  = latest_rel['assets']
-            .find(e => e['name'] == 'goonto')['browser_download_url'];
-        let release_exe  = latest_rel['assets']
-            .find(e => e['name'].endsWith('.exe'))['browser_download_url'];
-
-        release_link.href = release_url;
-        release_link.innerText = release_name;
-        if (['Windows', 'Win32', 'Win64'].indexOf(window.navigator.platform) != -1) {
-            cum_now_link.href = release_exe;
-        } else {
-            cum_now_link.href = release_elf;
-        }
-    };
-    </script>
 </head>
 <body class="w-screen h-screen">
     <div id="cum-now-modal"
@@ -69,20 +38,13 @@
             
             <div class="flex flex-col">
                 <a id="cum-now"
+                    href="https://github.com/zoomasochist/goonto/releases"
                     class="text-[#54487A] bg-[#DFF0D8] py-5 px-10 self-center text-7xl transition
                         drop-shadow-[3px_3px_0_rgba(255,255,255,.3)] 
                         hover:drop-shadow-[5px_5px_0_rgba(255,255,255,.3)]
                         hover:bg-[#D0E9C5] cursor-pointer">
                     Cum Now!
                 </a>
-
-                <p class="text-sm self-center text-white">
-                    Release
-                    <a id="release-url" class="text-[#DFF0D8] cursor-pointer">(loading release..)</a> —
-                    <a href="https://github.com/zoomasochist/goonto/releases" class="text-[#DFF0D8] cursor-pointer">
-                        see all releases
-                    </a>
-                </p>
             </div>
         </div>
 

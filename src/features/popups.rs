@@ -99,6 +99,13 @@ fn make_window_topmost(handle: fltk::window::RawHandle) {
         SetWindowPos(handle as _, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     }
 
+    #[cfg(target_os = "macos")] unsafe {
+        use objc2::{*, runtime::*};
+
+        let wind: &AnyObject = std::mem::transmute::<_, _>(handle);
+        let _: () = msg_send![wind, setLevel: (1 as isize)];
+    }
+
     #[cfg(target_os = "linux")] unsafe {
         use x11::xlib::*;
         use std::ffi::CString;

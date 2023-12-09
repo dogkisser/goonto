@@ -4,7 +4,6 @@ on:
   release:
     types: [published]
 
-
 jobs:
   build:
     name: Build
@@ -12,7 +11,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        os: [ubuntu, windows]
+        os: [ubuntu, windows, macos]
 
     permissions:
       contents: write
@@ -22,18 +21,39 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
-      - name: install deps
+      - name: install build deps
         run: >
           sudo apt-get update && sudo apt-get install --no-install-recommends -y
           cmake
           libx11-dev libxext-dev libxft-dev libxinerama-dev libxcursor-dev libxrender-dev
           libxfixes-dev libpango1.0-dev libgl1-mesa-dev libglu1-mesa-dev libxdo-dev
-        if: ${{ matrix.os != 'windows' }}
+        if: ${{ matrix.os == 'ubuntu' }}
       
-      - name: build release
+      - name: build release (linux/windows)
         run: cargo build --release
+        if: ${{ matrix.os != 'macos' }}
+      
+      # Build a fat binary with universal2 for x86 and ARM macOS support
+      - name: build release (macos)
+        run: |
+          rustup target add aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
+          cargo install universal2
+          cargo universal2
+          mkdir -p target/release
+          mv target/universal2-apple-darwin/release/goonto target/release/goonto-macos-fat
+        if: ${{ matrix.os == 'macos' }}
 
-      - name: add artifact
+      # IDK if this is proper
+      - name: rename Windows artifact
+        run: mv "target/release/goonto.exe" "target/release/goonto-windows.exe"
+        if: ${{ matrix.os == 'windows' }}
+       
+      - name: rename Linux artifact
+        run: mv "target/release/goonto" "target/release/goonto-linux-x11"
+        if: ${{ matrix.os == 'ubuntu' }}
+
+      - name: publish artifact
         uses: softprops/action-gh-release@v1
         with:
-          files: target/release/goonto*(.exe)
+          files: target/release/goonto-*
