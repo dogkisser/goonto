@@ -3,7 +3,7 @@
 
 # Whether Goonto should run automatically when your computer starts.
 # This only works on Windows :)
-run-on-boot: no
+run-on-boot: false
 
 # This configures where Goonto will get its images from.
 # You can either use the internet ("web") or local images ("local"). If the "local" key is
@@ -31,16 +31,19 @@ image-source:
 effects:
   # Popups that appear in random places on your screen.
   popups:
-    enabled: yes
+    enabled: true
     rate: 1000
     # Whether clicking a popup will close it.
-    closable: yes
+    closable: true
     # How many milliseconds until the popup closes itself.
     # 0 Turns this off.
-    closes-after: 0
+    closes-after: 3000
+    # Maximum number of popups that can be open at once
+    # 0 == unlimited
+    max: 0
     # Whether clicking on a popup clicks the popup or the window underneath it.
     # "true" effectively disables closeable.
-    click-through: no
+    click-through: false
     # Spawn more popups after closing one
     mitosis:
       # Make this 0 to effectively disable mitosis
@@ -54,19 +57,19 @@ effects:
 
   # Sends system notifications
   notifs:
-    enabled: no
+    enabled: false
     rate: 5000
 
   # Automatically types for you
   typing:
-    enabled: no
-    rate: 1000
+    enabled: true
+    rate: 3000
     # Whether it should press enter for you, too.
-    press-enter: no
+    press-enter: true
   
   # Overwrites your clipboard
   clipboard:
-    enabled: no
+    enabled: false
     rate: 5000
 
 # Strings to use for notifiactions, typing, and clipboard text.

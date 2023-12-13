@@ -13,7 +13,7 @@ impl Clipboard {
         let rate = self.rate as f64 / 1000.;
 
         app::add_timeout3(rate, move |handle| {
-            app::copy(&source.third_person());
+            app::copy(&source.first_person());
             
             app::repeat_timeout3(rate, handle);
         });

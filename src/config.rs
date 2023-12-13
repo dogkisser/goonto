@@ -25,9 +25,10 @@ pub struct Web {
     pub tags: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub enum Booru {
     #[serde(rename = "e621.net")]
+    #[default]
     E621,
     #[serde(rename = "rule34.xxx")]
     Rule34,
@@ -56,11 +57,5 @@ impl Config {
     pub fn save(&self) -> Result<()> {
         std::fs::write("./goonto.yml", serde_yaml::to_string(&self)?)?;
         Ok(())
-    }
-}
-
-impl Default for Booru {
-    fn default() -> Self {
-        Booru::E621
     }
 }

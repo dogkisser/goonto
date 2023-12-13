@@ -37,12 +37,9 @@ fn main() {
                When you're done, press Control + Backspace to exit.");
     }
 
-    match app() {
-        Err(e) => {
-            dialog(&format!("Something went wrong :( Please report this to {}\nMessage: {:?}",
-                    "https://github.com/zoomasochist/goonto/issues", e));
-            },
-        _ => { },
+    if let Err(e) = app() {
+        dialog(&format!("Something went wrong :( Please report this to {}\nMessage: {:?}",
+        "https://github.com/zoomasochist/goonto/issues", e));
     }
 }
 
@@ -87,7 +84,7 @@ fn app() -> anyhow::Result<()> {
 
     loop {
         app::wait_for(100.)?;
-        if let Ok(_) = GlobalHotKeyEvent::receiver().try_recv() {
+        if GlobalHotKeyEvent::receiver().try_recv().is_ok() {
             std::process::exit(0);
         }
     }

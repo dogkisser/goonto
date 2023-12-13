@@ -29,7 +29,14 @@ features = ["blocking", "rustls-tls", "json", "stream"]
 x11 = "2.21.0"
 
 [target.'cfg(target_os = "windows")'.dependencies]
-winapi = { version = "0.3.9", features = ["std", "winuser"] }
+windows = { version = "0.52.0", features = [
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_Input",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI",
+    "Win32_Foundation",
+    "Win32"
+]}
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.5.0"
@@ -37,6 +44,9 @@ objc2 = "0.5.0"
 [target.'cfg(not(target_os = "linux"))'.dependencies.fltk]
 version = "1.4.16"
 features = ["fltk-bundled"]
+
+[target.'cfg(target_os = "windows")'.build-dependencies]
+embed-resource = "2.4.0"
 
 [profile.release]
 opt-level = "z"

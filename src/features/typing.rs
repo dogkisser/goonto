@@ -17,13 +17,25 @@ impl Typing {
         let mut enigo = Enigo::new();
 
         app::add_timeout3(rate, move |handle| {
-            enigo.key_sequence_parse(&source.first_person());
+            block_input(true);
+
+            enigo.key_sequence_parse(&source.first_person().to_lowercase());
             if self.press_enter {
                 enigo.key_click(Key::Return);
             }
 
+            block_input(false);
+
             app::repeat_timeout3(rate, handle);
         });
+    }
+}
+
+fn block_input(should: bool) {
+    #[cfg(target_os = "windows")] unsafe {
+        use windows::Win32::UI::Input::KeyboardAndMouse::BlockInput;
+        
+        let _ = BlockInput(should);
     }
 }
 

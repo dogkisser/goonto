@@ -25,7 +25,7 @@ impl Local {
         let source = cfg.image_source.local.clone();
         thread::spawn({
             let clone = Arc::clone(&r.images);
-            move || { let _ = stocktake(source, clone); }
+            move || { stocktake(source, clone); }
         });
 
         Ok(r)
@@ -42,7 +42,7 @@ impl sources::Source for Local {
     }
 
     fn image(&self) -> String {
-        crate::sources::random_from(&mut self.images.lock().unwrap())
+        crate::sources::random_from(&self.images.lock().unwrap())
     }
 }
 

@@ -1,7 +1,11 @@
 use std::rc::Rc;
+use std::sync::{Mutex, OnceLock};
 use fltk::{prelude::*, app, window::Window, button::Button, image::SharedImage};
 use serde::{Serialize, Deserialize};
 use rand::Rng;
+
+// Not a great implementation but it's really easy and safe
+static COUNT: OnceLock<Mutex<u64>> = OnceLock::new();
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 #[serde(rename_all = "kebab-case")]
@@ -11,6 +15,7 @@ pub struct Popups {
     closable: bool,
     closes_after: u64,
     click_through: bool,
+    max: u64,
     opacity: Opacity,
     mitosis: Mitosis,
 }
@@ -29,10 +34,11 @@ pub struct Opacity {
 
 impl Popups {
     pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {
+        let _ = COUNT.get_or_init(|| Mutex::new(0));
         let rate = self.rate as f64 / 1000.;
 
         app::add_timeout3(rate, move |handle| {
-            let _ = new_popup(handle, Rc::clone(&source), self);
+            let _ = new_popup(Rc::clone(&source), self);
 
             app::repeat_timeout3(rate, handle);
         });
@@ -47,6 +53,7 @@ impl Default for Popups {
             closable: true,
             closes_after: 60_000,
             click_through: false,
+            max: 0,
             opacity: Opacity { from: 30, to: 100 },
             mitosis: Mitosis {
                 chance: 20,
@@ -56,13 +63,22 @@ impl Default for Popups {
     }
 }
 
+
 /* Returns the number of new popups to create immediately */
-fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), source: Rc<T>, cfg: Popups)
-    -> anyhow::Result<()>
+fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
+    source: Rc<T>,
+    cfg: Popups
+) -> anyhow::Result<()>
 {
+    if cfg.max != 0 && *COUNT.get().unwrap().lock().unwrap() >= cfg.max {
+        return Ok(())
+    }
+    *COUNT.get().unwrap().lock().unwrap() += 1;
+
     let image_path = source.image();
 
     if image_path.is_empty() {
+        *COUNT.get().unwrap().lock().unwrap() -= 1;
         return Ok(())
     }
             
@@ -83,10 +99,11 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), sour
         if cfg.closable {
             /* SAFETY: I _know_ this widget has a window */
             w.window().unwrap().hide();
+            *COUNT.get().unwrap().lock().unwrap() -= 1;
 
             if rand::thread_rng().gen_range(0..100) < cfg.mitosis.chance {
                 for _ in 0..rand::thread_rng().gen_range(0..cfg.mitosis.max) {
-                    let _ = new_popup(handle, Rc::clone(&source), cfg);
+                    let _ = new_popup(Rc::clone(&source), cfg);
                 }
             }
         }
@@ -107,6 +124,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), sour
     if cfg.closes_after > 0 {
         app::add_timeout3(cfg.closes_after as f64 / 1000., move |_handle| {
             wind.hide();
+            *COUNT.get().unwrap().lock().unwrap() -= 1;
         });
     }
 
@@ -115,9 +133,12 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), sour
 
 fn make_window_topmost(handle: fltk::window::RawHandle) {
     #[cfg(target_os = "windows")] unsafe {
-        use winapi::um::winuser::*;
+        use windows::Win32::Foundation::HWND;
+        use windows::Win32::UI::WindowsAndMessaging::{
+            SetWindowPos, HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE,
+        };
 
-        SetWindowPos(handle as _, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        let _ = SetWindowPos(HWND(handle as _), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     }
 
     #[cfg(target_os = "macos")] unsafe {
@@ -166,16 +187,16 @@ fn make_window_topmost(handle: fltk::window::RawHandle) {
 
 fn make_window_clickthrough(handle: fltk::window::RawHandle) {
     #[cfg(target_os = "windows")] unsafe {
-        use winapi::um::winuser::{
+        use windows::Win32::Foundation::HWND;
+        use windows::Win32::UI::WindowsAndMessaging::{
             GWL_EXSTYLE, WS_EX_TRANSPARENT, WS_EX_LAYERED,
             GetWindowLongA, SetWindowLongA
         };
 
-        // For some god-forsaken reason the enums are u32 but the functions take i32s.
-        let current_style = GetWindowLongA(handle as _, GWL_EXSTYLE) as u32;
-        SetWindowLongA(handle as _,
+        let current_style = GetWindowLongA(HWND(handle as _), GWL_EXSTYLE) as u32;
+        let _ = SetWindowLongA(HWND(handle as _),
             GWL_EXSTYLE,
-            (current_style | WS_EX_TRANSPARENT | WS_EX_LAYERED) as i32
+            (current_style | WS_EX_TRANSPARENT.0 | WS_EX_LAYERED.0) as i32,
         );
     }
 }

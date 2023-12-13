@@ -94,8 +94,7 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>)
             .unwrap()
             .posts
             .into_iter()
-            .filter(|p| p.sample.url.is_some())
-            .map(   |p| p.sample.url.unwrap())
+            .filter_map(|p| p.sample.url)
             .collect::<Vec<String>>();
 
         let imagez = &images;
