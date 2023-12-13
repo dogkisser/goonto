@@ -15,12 +15,12 @@
 | Notification spam   |      ❌      |     ✅     |
 | Clipboard replace   |      ❌      |     ✅     |
 | Auto-type           |      ❌      |     ✅     |
+| Arbitrary folder for source | ❌    |     ✅     |
 | Panic button        |      ✅      |     ✅     |
 | Website opening     |      ✅      |     ✅     |
 | Popups              |      ✅      |     ✅     |
 | Popup opacity       |      ✅      |     ✅     |
 | Popup mitosis       |      ✅      |     ✅     |
-| Arbitrary folder for source | ✅    |     ✅     |
 | Popup censoring     |      ✅      |     ❌     |
 | Video popups        |      ✅      |     ❌     |
 | Drive filler        |      ✅      |     ❌     |

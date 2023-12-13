@@ -6,7 +6,6 @@ use fltk::{app};
 pub struct Notifs {
     pub enabled: bool,
     rate: u128,
-    close_automatically: bool,
 }
 
 impl Notifs {
@@ -19,7 +18,7 @@ impl Notifs {
              */
             let _ = notify_rust::Notification::new()
                 .summary("Goonto notification!")
-                .body(&source.prompt())
+                .body(&source.third_person())
                 // This doesn't build on Windows?
                 // .hint(notify_rust::Hint::Resident(self.close_automatically))
                 .show();
@@ -34,7 +33,6 @@ impl Default for Notifs {
         Self {
             enabled: true,
             rate: 15_000,
-            close_automatically: true,
         }
     }
 }

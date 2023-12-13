@@ -1,15 +1,19 @@
+use rand::prelude::{IteratorRandom, SliceRandom};
+
 mod e621;
+mod rule34;
 mod local;
 pub use e621::E621;
+pub use rule34::Rule34;
 pub use local::Local;
 
 pub trait Source: Send + Sync {
     fn image(&self) -> String;
-    fn prompt(&self) -> String;
-    fn babble(&self) -> String;
+    fn first_person(&self) -> String;
+    fn third_person(&self) -> String;
 }
 
-const LOCAL_PROMPTS: [&str; 61] = [
+const THIRD_PERSON: [&str; 61] = [
     "Your body is a temple for PORN, worship it and be consumed by it.",
     "Don't just be a good boy, be a good pump puppy.",
     "Don't cum, be a good pump puppy.",
@@ -73,7 +77,7 @@ const LOCAL_PROMPTS: [&str; 61] = [
     "You are nothing without PORN, let it consume you completely.",
 ];
 
-const LOCAL_BABBLE: [&str; 17] = [
+const FIRST_PERSON: [&str; 17] = [
     "OMFG YES PLEASE MORE FURRY PORN GOD BLESS",
     "I'm addicted to the feeling of letting go and giving into my desires.",
     "I CANT BELIEVE IM JERKING OFF TO FURRY PORN WHAT THE ACTUAL F**K HAPPENED TO ME",
@@ -92,3 +96,35 @@ const LOCAL_BABBLE: [&str; 17] = [
     "It feels so good to let go and be consumed by PORN. ",
     "My musky goonstick won't stop pumping out cummmm hhnnnngggg",
 ];
+
+fn get_babble(cfg: &crate::Config) -> (Vec<String>, Vec<String>) {
+    (if_empty(cfg.babble.first_person.clone(),
+        FIRST_PERSON.iter().map(|s| String::from(*s)).collect()),
+     if_empty(cfg.babble.third_person.clone(),
+        THIRD_PERSON.iter().map(|s| String::from(*s)).collect()))
+}
+
+fn if_empty<T>(maybe: Vec<T>, fallback: Vec<T>) -> Vec<T> {
+    if maybe.is_empty() {
+        fallback
+    } else {
+        maybe
+    }
+}
+
+fn random_from<T: std::default::Default + Clone>(x: &Vec<T>) -> T {
+    if x.is_empty() {
+        return T::default()
+    }
+
+    x.choose(&mut rand::thread_rng()).unwrap().clone()
+}
+
+fn take_random<T: std::default::Default>(x: &mut Vec<T>) -> T {
+    if x.is_empty() {
+        return T::default()
+    }
+
+    let i = (0..x.len()).choose(&mut rand::thread_rng()).unwrap();
+    x.swap_remove(i)
+}

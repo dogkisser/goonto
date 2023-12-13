@@ -1,4 +1,4 @@
-#![windows_subsystem = "windows"]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use std::rc::Rc;
 use std::path::Path;
 use fltk::app;
@@ -23,7 +23,7 @@ fn main() {
     }
 
     if let Err(e) = Config::load() {
-        if e.is::<serde_json::Error>() {
+        if e.is::<serde_yaml::Error>() {
             dialog(&format!("Couldn't parse your configuration file!\n{:?}", e));
             return
         }
@@ -48,11 +48,18 @@ fn main() {
 fn app() -> anyhow::Result<()> {
     let cfg = Config::load()?;
 
+    set_run_on_boot(cfg.run_on_boot)?;
+
     let source: Rc<dyn sources::Source> =
-        if Path::new(&cfg.source_path).exists() {
-            Rc::new(sources::Local::new(cfg.source_path)?)
+        if Path::new(&cfg.image_source.local).exists() {
+            Rc::new(sources::Local::new(&cfg)?)
         } else {
-            Rc::new(sources::E621::new(cfg.source_tags)?)
+            use crate::config::Booru;
+
+            match cfg.image_source.web.booru {
+                Booru::E621 => Rc::new(sources::E621::new(&cfg)?),
+                Booru::Rule34 => Rc::new(sources::Rule34::new(&cfg)?),
+            }
         };
 
     let manager = GlobalHotKeyManager::new()?;
@@ -61,20 +68,20 @@ fn app() -> anyhow::Result<()> {
 
     let _app = app::App::default();
 
-    if cfg.popups.enabled {
-        cfg.popups.run(Rc::clone(&source));
+    if cfg.effects.popups.enabled {
+        cfg.effects.popups.run(Rc::clone(&source));
     }
 
-    if cfg.notifs.enabled {
-        cfg.notifs.run(Rc::clone(&source));
+    if cfg.effects.notifs.enabled {
+        cfg.effects.notifs.run(Rc::clone(&source));
     }
 
-    if cfg.typing.enabled {
-        cfg.typing.run(Rc::clone(&source));
+    if cfg.effects.typing.enabled {
+        cfg.effects.typing.run(Rc::clone(&source));
     }
 
-    if cfg.clipboard.enabled {
-        cfg.clipboard.run(Rc::clone(&source));
+    if cfg.effects.clipboard.enabled {
+        cfg.effects.clipboard.run(Rc::clone(&source));
     }
 
     loop {
@@ -83,4 +90,26 @@ fn app() -> anyhow::Result<()> {
             std::process::exit(0);
         }
     }
+}
+
+fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
+    let directories = directories::BaseDirs::new().unwrap();
+
+    #[cfg(target_os = "windows")] {
+        let startup = directories.config_dir().join("Microsoft/Windows/Start Menu/Programs/Startup");
+        let persist_bin = startup.join("goonto.exe");
+        let persist_cfg = startup.join("goonto.yml");
+
+        if to {
+            let me = std::env::current_exe()?;
+            std::fs::copy(me, persist_bin)?;
+            std::fs::copy("./goonto.yml", persist_cfg)?;
+        } else {
+            // Ignore errors because it'll probably be that it doesn't exist, and that's okay.
+            let _ = std::fs::remove_file(persist_bin);
+            let _ = std::fs::remove_file(persist_cfg);
+        }
+    }
+
+    Ok(())
 }

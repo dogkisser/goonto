@@ -10,28 +10,23 @@ use futures::{stream, StreamExt};
 use crate::sources;
 
 #[derive(Debug)]
-pub struct E621 {
+pub struct Rule34 {
     images: Arc<Mutex<Vec<String>>>,
     first_person: Vec<String>,
     third_person: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
-struct E6Posts {
-    posts: Vec<E6Post>,
+struct Posts {
+    post: Vec<Post>,
 }
 
 #[derive(Debug, Deserialize)]
-struct E6Post {
-    sample: E6File,
+struct Post {
+    sample_url: String,
 }
 
-#[derive(Debug, Deserialize)]
-struct E6File {
-    url: Option<String>,
-}
-
-impl E621 {
+impl Rule34 {
     pub fn new(cfg: &crate::Config) -> anyhow::Result<Self> {
         let (first, third) = crate::sources::get_babble(cfg);
         let r = Self {
@@ -52,7 +47,7 @@ impl E621 {
     }
 }
 
-impl sources::Source for E621 {
+impl sources::Source for Rule34 {
     fn first_person(&self) -> String {
         crate::sources::random_from(&self.first_person)
     }
@@ -64,7 +59,6 @@ impl sources::Source for E621 {
     fn image(&self) -> String {
         crate::sources::take_random(&mut self.images.lock().unwrap())
     }
-    
 }
 
 /* TODO: hacky in general */
@@ -77,29 +71,30 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>)
             continue;
         }
 
-        let mut url = "https://e621.net/posts.json?limit=25&tags=-animated rating:e order:random score:>300 "
+        let mut url = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=10&tags="
             .to_string();
         url.push_str(&crate::sources::random_from(&tags));
 
         let client = reqwest::Client::new();
 
-        let resp = client
+        let resp_text = client
             .get(url)
-            .header(reqwest::header::USER_AGENT, "Goonto/1.0.69")
             .send()
             .await
             .unwrap()
-            .json::<E6Posts>()
+            .text()
             .await
+            .unwrap();
+        
+        let parsed = serde_xml_rs::from_str::<Posts>(&resp_text)
             .unwrap()
-            .posts
+            .post
             .into_iter()
-            .filter(|p| p.sample.url.is_some())
-            .map(   |p| p.sample.url.unwrap())
+            .map(|p| p.sample_url)
             .collect::<Vec<String>>();
 
         let imagez = &images;
-        let new_images = stream::iter(resp)
+        let new_images = stream::iter(parsed)
             .map(|image_url| {
                 let client = &client;
                 let (_, filename) = &image_url.rsplit_once('/').unwrap();

@@ -4,11 +4,14 @@ use serde::{Serialize, Deserialize};
 use rand::Rng;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[serde(rename_all = "kebab-case")]
 pub struct Popups {
     pub enabled: bool,
     rate: u64,
     closable: bool,
-    opacity: [u16; 2],
+    closes_after: u64,
+    click_through: bool,
+    opacity: Opacity,
     mitosis: Mitosis,
 }
 
@@ -16,6 +19,12 @@ pub struct Popups {
 pub struct Mitosis {
     chance: u16,
     max: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+pub struct Opacity {
+    from: u16,
+    to: u16,
 }
 
 impl Popups {
@@ -36,7 +45,9 @@ impl Default for Popups {
             enabled: true,
             rate: 1_500,
             closable: true,
-            opacity: [30, 100],
+            closes_after: 60_000,
+            click_through: false,
+            opacity: Opacity { from: 30, to: 100 },
             mitosis: Mitosis {
                 chance: 20,
                 max: 3,
@@ -57,7 +68,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), sour
             
     let mut image = SharedImage::load(image_path)?;
     let opacity = rand::thread_rng()
-        .gen_range(cfg.opacity[0]..cfg.opacity[1]) as f64 / 100.;
+        .gen_range(cfg.opacity.from..cfg.opacity.to) as f64 / 100.;
 
     let (img_w, img_h) = reasonable_size(&image);
     let (win_x, win_y) = window_position();
@@ -88,6 +99,16 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(handle: *mut (), sour
     wind.set_opacity(opacity);
 
     make_window_topmost(wind.raw_handle());
+
+    if cfg.click_through {
+        make_window_clickthrough(wind.raw_handle());
+    }
+
+    if cfg.closes_after > 0 {
+        app::add_timeout3(cfg.closes_after as f64 / 1000., move |_handle| {
+            wind.hide();
+        });
+    }
 
     Ok(())
 }
@@ -140,6 +161,22 @@ fn make_window_topmost(handle: fltk::window::RawHandle) {
         
         XFlush(display);
         XCloseDisplay(display);
+    }
+}
+
+fn make_window_clickthrough(handle: fltk::window::RawHandle) {
+    #[cfg(target_os = "windows")] unsafe {
+        use winapi::um::winuser::{
+            GWL_EXSTYLE, WS_EX_TRANSPARENT, WS_EX_LAYERED,
+            GetWindowLongA, SetWindowLongA
+        };
+
+        // For some god-forsaken reason the enums are u32 but the functions take i32s.
+        let current_style = GetWindowLongA(handle as _, GWL_EXSTYLE) as u32;
+        SetWindowLongA(handle as _,
+            GWL_EXSTYLE,
+            (current_style | WS_EX_TRANSPARENT | WS_EX_LAYERED) as i32
+        );
     }
 }
 

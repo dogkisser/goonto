@@ -1,0 +1,84 @@
+# Example Goonto configuration.
+# Everything past the hash symbol (#) is a comment, and is ignored.
+
+# Whether Goonto should run automatically when your computer starts.
+# This only works on Windows :)
+run-on-boot: false
+
+# This configures where Goonto will get its images from.
+# You can either use the internet ("web") or local images ("local"). If the "local" key is
+# a valid path, that is used, overriding web.
+image-source:
+  # "web" is used to get images from the internet
+  web:
+    # The booru to get images from. "e621.net" and "rule34.xxx" are supported.
+    booru: e621.net
+    # Tags to use to query boorus. Each line (beginning with a hyphen) is an individual query,
+    # i.e., every tag on a given line will be used as part of the search.
+    tags:
+      - ~equine ~canine dominant_feral
+      - sugarlesspaints zebra -comic
+      - zackary911
+
+  # Leave this empty to use web. Put a path here to use images from a folder on your computer.
+  # Overrides web.
+  local:
+  # local: C:\Users\gooner69\Desktop\tax-details\2014\backup
+
+# Things Goonto will do.
+# Most effects at least have the options "enabled" and "rate". Rate is how often the effect occurs.
+# Rates are in milliseconds.
+effects:
+  # Popups that appear in random places on your screen.
+  popups:
+    enabled: true
+    rate: 1000
+    # Whether clicking a popup will close it.
+    closable: true
+    # How many milliseconds until the popup closes itself.
+    # 0 Turns this off.
+    closes-after: 0
+    # Whether clicking on a popup clicks the popup or the window underneath it.
+    # "true" effectively disables closeable.
+    click-through: false
+    # Spawn more popups after closing one
+    mitosis:
+      # Make this 0 to effectively disable mitosis
+      chance: 50
+      # Maximum # of popups to open
+      max: 5
+    # The opacity of images
+    opacity:
+      from: 50
+      to:   100
+
+  # Sends system notifications
+  notifs:
+    enabled: false
+    rate: 5000
+
+  # Automatically types for you
+  typing:
+    enabled: false
+    rate: 1000
+    # Whether it should press enter for you, too.
+    press-enter: false
+  
+  # Overwrites your clipboard
+  clipboard:
+    enabled: false
+    rate: 5000
+
+# Strings to use for notifiactions, typing, and clipboard text.
+# If this is empty, a default list is used. Otherwise, only these strings are used.
+babble:
+  # These are from the perspective of the user - used for typing and the clipboard.
+  first-person:
+  # - Thank you for existing, Furry Porn.
+  # - I am so fucking horny right now...
+  # - I'm addicted to the feeling of letting go and giving into my desires.
+  # These are from the perspective of somebody talking to the user - used for notifications.
+  third-person:
+  # - Your body is a temple for PORN, worship it and be consumed by it.
+  # - Don't cum, be a good pump puppy.
+  # - Don't think, just pump. Porn is your master now.

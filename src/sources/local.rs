@@ -1,27 +1,28 @@
 use std::thread;
 use std::fs::DirEntry;
 use std::sync::{Arc, Mutex};
-use rand::prelude::SliceRandom;
 
 use crate::sources;
 
 pub struct Local {
     images: Arc<Mutex<Vec<String>>>,
-    prompts: Vec<String>,
-    babble: Vec<String>,
+    first_person: Vec<String>,
+    third_person: Vec<String>,
 }
 
 impl Local {
-    pub fn new(source: String) -> anyhow::Result<Self> {
+    pub fn new(cfg: &crate::Config) -> anyhow::Result<Self> {
         // This architecture is a little weird but it echoes the E6 impl
         // With big porn folders it may take a prohibitively long time to index everything
         // So relegate it to a thread.. I guess? :)
+        let (first, third) = crate::sources::get_babble(cfg);
         let r = Self {
             images: Arc::new(Mutex::new(Vec::new())),
-            prompts: sources::LOCAL_PROMPTS.iter().map(|s| String::from(*s)).collect(),
-            babble:  sources::LOCAL_BABBLE.iter().map(|s| String::from(*s)).collect(),
+            first_person: first,
+            third_person: third,
         };
 
+        let source = cfg.image_source.local.clone();
         thread::spawn({
             let clone = Arc::clone(&r.images);
             move || { let _ = stocktake(source, clone); }
@@ -32,16 +33,16 @@ impl Local {
 }
 
 impl sources::Source for Local {
-    fn prompt(&self) -> String {
-        random_from(&self.prompts)
+    fn first_person(&self) -> String {
+        crate::sources::random_from(&self.first_person)
+    }
+
+    fn third_person(&self) -> String {
+        crate::sources::random_from(&self.third_person)
     }
 
     fn image(&self) -> String {
-        random_from(&mut self.images.lock().unwrap())
-    }
-    
-    fn babble(&self) -> String {
-        random_from(&self.babble)
+        crate::sources::random_from(&mut self.images.lock().unwrap())
     }
 }
 
@@ -58,14 +59,6 @@ fn stocktake(source: String, images: Arc<Mutex<Vec<String>>>) {
                 images.lock().unwrap().push(path_str);
             }
         });
-}
-
-fn random_from<T: std::default::Default + Clone>(x: &Vec<T>) -> T {
-    if x.is_empty() {
-        return T::default()
-    }
-
-    x.choose(&mut rand::thread_rng()).unwrap().clone()
 }
 
 fn allowed_extension(entry: &DirEntry) -> bool {
