@@ -11,6 +11,11 @@ run-on-boot: false
 image-source:
   # "web" is used to get images from the internet
   web:
+    # Whether to download "sample" or "full" resolution images. Samples may be significantly faster,
+    # particularly with high rates or slow connections, but you may want to use "full" in case
+    # you see images you like and want to save them.
+    # Samples are more than high-res enough to look good in popups.
+    image_res: full
     # The booru to get images from. "e621.net" and "rule34.xxx" are supported.
     booru: e621.net
     # Tags to use to query boorus. Each line (beginning with a hyphen) is an individual query,

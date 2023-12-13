@@ -8,6 +8,7 @@ use serde::Deserialize;
 use futures::{stream, StreamExt};
 
 use crate::sources;
+use crate::config::ImageRes;
 
 #[derive(Debug)]
 pub struct E621 {
@@ -23,6 +24,7 @@ struct E6Posts {
 
 #[derive(Debug, Deserialize)]
 struct E6Post {
+    file: E6File,
     sample: E6File,
 }
 
@@ -43,9 +45,10 @@ impl E621 {
         let _ = fs::create_dir_all("./goonto-cache");
 
         let tags = cfg.image_source.web.tags.clone();
+        let full_res = cfg.image_source.web.image_res == ImageRes::Full;
         thread::spawn({
             let clone = Arc::clone(&r.images);
-            move || { let _ = stocktake(tags, clone); }
+            move || { let _ = stocktake(tags, clone, full_res); }
         });
 
         Ok(r)
@@ -68,7 +71,7 @@ impl sources::Source for E621 {
 }
 
 /* TODO: hacky in general */
-fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>)
+fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool)
     -> anyhow::Result<()>
 {
     tokio::runtime::Runtime::new().unwrap().block_on(async { loop {
@@ -94,7 +97,7 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>)
             .unwrap()
             .posts
             .into_iter()
-            .filter_map(|p| p.sample.url)
+            .filter_map(|p| if full_res { p.file.url } else { p.sample.url })
             .collect::<Vec<String>>();
 
         let imagez = &images;

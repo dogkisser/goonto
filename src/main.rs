@@ -46,7 +46,7 @@ fn main() {
 fn app() -> anyhow::Result<()> {
     let cfg = Config::load()?;
 
-    set_run_on_boot(cfg.run_on_boot)?;
+    eprintln!("set run on boot: {:?}", set_run_on_boot(cfg.run_on_boot));
 
     let source: Rc<dyn sources::Source> =
         if Path::new(&cfg.image_source.local).exists() {
@@ -92,20 +92,78 @@ fn app() -> anyhow::Result<()> {
 
 fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
     let directories = directories::BaseDirs::new().unwrap();
+    let me = std::env::current_exe()?;
 
-    #[cfg(target_os = "windows")] {
-        let startup = directories.config_dir().join("Microsoft/Windows/Start Menu/Programs/Startup");
-        let persist_bin = startup.join("goonto.exe");
-        let persist_cfg = startup.join("goonto.yml");
+    #[cfg(target_os = "windows")] unsafe {
+        use windows::{
+            core::BSTR,
+            Win32::{
+                Security::PSECURITY_DESCRIPTOR,
+                System::{
+                    Variant::VariantInit,
+                    TaskScheduler::{
+                        TASK_CREATE_OR_UPDATE, TASK_LOGON_GROUP,
+                        TaskScheduler,
+                        ITaskService,
+                    },
+                    Com::{
+                        COINIT_MULTITHREADED, RPC_C_AUTHN_LEVEL_PKT_PRIVACY,
+                        RPC_C_IMP_LEVEL_IMPERSONATE, EOLE_AUTHENTICATION_CAPABILITIES, CLSCTX_ALL,
+                        CoInitializeEx, CoInitializeSecurity, CoCreateInstance
+                    }
+                }
+            }
+        };
+
+        let drop_to = directories.config_dir().join("Goonto");
+        let bin_out = drop_to.join("goonto.exe");
+        let cfg_out = drop_to.join("goonto.yml");
+        
+        std::fs::create_dir_all(&drop_to)?;
+        
+        let schema = include_str!("../res/win/scheduler-task.xml")
+            .replace("{REPLACE_WITH_GOONTO_PATH}", &bin_out.to_string_lossy());
+        let task_name = BSTR::from("Launch Goonto");
+        let task_folder_name = BSTR::from("\\");
+
+        // Initialise COM objects
+        CoInitializeEx(None, COINIT_MULTITHREADED)?;
+        CoInitializeSecurity(
+            PSECURITY_DESCRIPTOR(0 as _),
+            -1,
+            None,
+            None,
+            RPC_C_AUTHN_LEVEL_PKT_PRIVACY,
+            RPC_C_IMP_LEVEL_IMPERSONATE,
+            None,
+            EOLE_AUTHENTICATION_CAPABILITIES(0 as _),
+            None,
+        )?;
+        let itsvc: ITaskService = CoCreateInstance(&TaskScheduler, None, CLSCTX_ALL)?;
+
+        itsvc.Connect(std::mem::zeroed(), std::mem::zeroed(), std::mem::zeroed(), std::mem::zeroed())?;
+        let task_folder = itsvc.GetFolder(&task_folder_name)?;
 
         if to {
-            let me = std::env::current_exe()?;
-            std::fs::copy(me, persist_bin)?;
-            std::fs::copy("./goonto.yml", persist_cfg)?;
+            std::fs::copy(me, &bin_out)?;
+            std::fs::copy("./goonto.yml", cfg_out)?;
+
+            // Create task
+            let task = itsvc.NewTask(0)?;
+            task.SetXmlText(&BSTR::from(schema))?;
+
+            task_folder.RegisterTaskDefinition(
+                &task_name,
+                &task,
+                TASK_CREATE_OR_UPDATE.0,
+                std::mem::zeroed(),
+                VariantInit(),
+                TASK_LOGON_GROUP,
+                std::mem::zeroed(),
+            )?;
         } else {
-            // Ignore errors because it'll probably be that it doesn't exist, and that's okay.
-            let _ = std::fs::remove_file(persist_bin);
-            let _ = std::fs::remove_file(persist_cfg);
+            // Ignore the error because it'd probably be that the service doesn't exist
+            let _ = task_folder.DeleteTask(&task_name, 0);
         }
     }
 

@@ -22,6 +22,7 @@ pub struct ImageSource {
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Web {
     pub booru: Booru,
+    pub image_res: ImageRes,
     pub tags: Vec<String>,
 }
 
@@ -32,6 +33,15 @@ pub enum Booru {
     E621,
     #[serde(rename = "rule34.xxx")]
     Rule34,
+}
+
+#[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
+pub enum ImageRes {
+    #[serde(rename = "sample")]
+    #[default]
+    Sample,
+    #[serde(rename = "full")]
+    Full,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
