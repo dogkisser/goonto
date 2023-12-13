@@ -71,7 +71,7 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>)
             continue;
         }
 
-        let mut url = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=10&tags="
+        let mut url = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=10&tags=sort:random -animated "
             .to_string();
         url.push_str(&crate::sources::random_from(&tags));
 
