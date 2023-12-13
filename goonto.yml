@@ -3,7 +3,7 @@
 
 # Whether Goonto should run automatically when your computer starts.
 # This only works on Windows :)
-run-on-boot: false
+run-on-boot: no
 
 # This configures where Goonto will get its images from.
 # You can either use the internet ("web") or local images ("local"). If the "local" key is
@@ -26,21 +26,21 @@ image-source:
   # local: C:\Users\gooner69\Desktop\tax-details\2014\backup
 
 # Things Goonto will do.
-# Most effects at least have the options "enabled" and "rate". Rate is how often the effect occurs.
-# Rates are in milliseconds.
+# Most effects at least have the options "enabled" and "rate".
+# Rate is how often the effect occurs, in milliseconds.
 effects:
   # Popups that appear in random places on your screen.
   popups:
-    enabled: true
+    enabled: yes
     rate: 1000
     # Whether clicking a popup will close it.
-    closable: true
+    closable: yes
     # How many milliseconds until the popup closes itself.
     # 0 Turns this off.
     closes-after: 0
     # Whether clicking on a popup clicks the popup or the window underneath it.
     # "true" effectively disables closeable.
-    click-through: false
+    click-through: no
     # Spawn more popups after closing one
     mitosis:
       # Make this 0 to effectively disable mitosis
@@ -54,19 +54,19 @@ effects:
 
   # Sends system notifications
   notifs:
-    enabled: false
+    enabled: no
     rate: 5000
 
   # Automatically types for you
   typing:
-    enabled: false
+    enabled: no
     rate: 1000
     # Whether it should press enter for you, too.
-    press-enter: false
+    press-enter: no
   
   # Overwrites your clipboard
   clipboard:
-    enabled: false
+    enabled: no
     rate: 5000
 
 # Strings to use for notifiactions, typing, and clipboard text.
@@ -77,6 +77,7 @@ babble:
   # - Thank you for existing, Furry Porn.
   # - I am so fucking horny right now...
   # - I'm addicted to the feeling of letting go and giving into my desires.
+
   # These are from the perspective of somebody talking to the user - used for notifications.
   third-person:
   # - Your body is a temple for PORN, worship it and be consumed by it.
