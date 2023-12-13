@@ -33,7 +33,8 @@ fn main() {
             return
         }
 
-        dialog("No config file was found, so a default one was created.\n");
+        dialog("No config file was found, so a default one was created. Welcome!\n\
+               When you're done, press Control + Backspace to exit.");
     }
 
     match app() {
