@@ -8,6 +8,7 @@ use crate::features::*;
 #[serde(default, rename_all = "kebab-case")]
 pub struct Config {
     pub run_on_boot: bool,
+    pub save_logs: bool,
     pub image_source: ImageSource,
     pub effects: Effects,
     pub babble: Babble,
@@ -47,11 +48,13 @@ pub enum ImageRes {
 }
 
 #[derive(Serialize, Deserialize, Default)]
+#[serde(default)]
 pub struct Effects {
     pub popups: Popups,
     pub notifs: Notifs,
     pub typing: Typing,
     pub clipboard: Clipboard,
+    pub discord: Discord,
 }
 
 #[derive(Serialize, Deserialize, Default)]

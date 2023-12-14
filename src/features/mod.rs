@@ -6,3 +6,5 @@ mod typing;
 pub use typing::*;
 mod clipboard;
 pub use clipboard::*;
+mod discord;
+pub use discord::*;

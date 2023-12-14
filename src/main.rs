@@ -4,6 +4,7 @@ use std::rc::Rc;
 use std::path::Path;
 use fltk::app;
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey, Modifiers, Code}};
+use log::{LevelFilter, info};
 
 mod config;
 mod sources;
@@ -47,7 +48,22 @@ fn main() {
 fn app() -> anyhow::Result<()> {
     let cfg = Config::load()?;
 
-    eprintln!("set run on boot: {:?}", set_run_on_boot(cfg.run_on_boot));
+    if cfg.save_logs {
+        simplelog::WriteLogger::init(
+            LevelFilter::Info,
+            simplelog::Config::default(),
+            std::fs::File::create("goonto.log")?
+        )?;
+    } else {
+        simplelog::SimpleLogger::init(
+            LevelFilter::Info,
+            simplelog::Config::default(),
+        )?;
+    }
+
+    info!("loaded config: {:?}", serde_yaml::to_string(&cfg)); 
+
+    info!("set_run_on_boot: {:?}", set_run_on_boot(cfg.run_on_boot));
 
     let source: Rc<dyn sources::Source> =
         if Path::new(&cfg.image_source.local).exists() {
@@ -81,6 +97,10 @@ fn app() -> anyhow::Result<()> {
 
     if cfg.effects.clipboard.enabled {
         cfg.effects.clipboard.run(Rc::clone(&source));
+    }
+
+    if cfg.effects.discord.enabled {
+        cfg.effects.discord.run(Rc::clone(&source));
     }
 
     loop {

@@ -20,6 +20,9 @@ fltk = { version = "1.4.16", features = ["no-pango"] }
 global-hotkey = "0.4.0"
 single-instance = "0.3.3"
 defaults = "0.2.0"
+discord-rich-presence = "0.2.3"
+simplelog = "0.12.1"
+log = "0.4.2"
 
 [dependencies.reqwest]
 version = "0.11"
