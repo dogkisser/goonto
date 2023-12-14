@@ -1,14 +1,14 @@
 use std::rc::Rc;
 use std::sync::{Mutex, OnceLock};
 use fltk::{prelude::*, app, window::Window, button::Button, image::SharedImage};
-use serde::{Serialize, Deserialize};
+use serde::Deserialize;
 use rand::Rng;
 use defaults::Defaults;
 
 // Not a great implementation but it's really easy and safe
 static COUNT: OnceLock<Mutex<u64>> = OnceLock::new();
 
-#[derive(Serialize, Deserialize, Clone, Copy, Defaults)]
+#[derive(Deserialize, Copy, Clone, Defaults)]
 #[serde(default, rename_all = "kebab-case")]
 pub struct Popups {
     #[def = "true"]
@@ -24,7 +24,7 @@ pub struct Popups {
     mitosis: Mitosis,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Defaults)]
+#[derive(Deserialize, Copy, Clone, Defaults)]
 #[serde(default)]
 pub struct Mitosis {
     #[def = "30"]
@@ -33,7 +33,7 @@ pub struct Mitosis {
     max: u64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Defaults)]
+#[derive(Deserialize, Copy, Clone, Defaults)]
 #[serde(default)]
 pub struct Opacity {
     #[def = "70"]

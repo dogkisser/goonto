@@ -1,6 +1,6 @@
 use std::rc::Rc;
 use std::time::{SystemTime, Duration, UNIX_EPOCH};
-use serde::{Serialize, Deserialize};
+use serde::Deserialize;
 use log::info;
 use discord_rich_presence::{
     activity::{Activity, Button, Assets, Timestamps},
@@ -11,7 +11,7 @@ use defaults::Defaults;
 
 const DEFAULT_STATUS: &str = "Stroking their brains out~";
 
-#[derive(Serialize, Deserialize, Defaults)]
+#[derive(Deserialize, Defaults)]
 #[serde(default)]
 pub struct Discord {
     pub enabled: bool,

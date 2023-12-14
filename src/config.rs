@@ -1,10 +1,10 @@
 use std::fs::File;
-use serde::{Serialize, Deserialize};
+use serde::Deserialize;
 use anyhow::Result;
 
 use crate::features::*;
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Deserialize, Default)]
 #[serde(default, rename_all = "kebab-case")]
 pub struct Config {
     pub run_on_boot: bool,
@@ -15,14 +15,14 @@ pub struct Config {
     pub babble: Babble,
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Deserialize, Default)]
 #[serde(default)]
 pub struct ImageSource {
     pub web: Web,
     pub local: String,
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Deserialize, Default)]
 #[serde(default, rename_all = "kebab-case")]
 pub struct Web {
     pub booru: Booru,
@@ -30,7 +30,7 @@ pub struct Web {
     pub tags: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Deserialize, Default)]
 pub enum Booru {
     #[serde(rename = "e621.net")]
     #[default]
@@ -41,7 +41,7 @@ pub enum Booru {
     Realbooru,
 }
 
-#[derive(Serialize, Deserialize, Default, PartialEq)]
+#[derive(Deserialize, Default, PartialEq, Debug)]
 pub enum ImageRes {
     #[serde(rename = "sample")]
     #[default]
@@ -50,7 +50,7 @@ pub enum ImageRes {
     Full,
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Deserialize, Default)]
 #[serde(default)]
 pub struct Effects {
     pub popups: Popups,
@@ -60,7 +60,7 @@ pub struct Effects {
     pub discord: Discord,
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Deserialize, Default)]
 #[serde(rename_all = "kebab-case")]
 #[serde(default)]
 pub struct Babble {

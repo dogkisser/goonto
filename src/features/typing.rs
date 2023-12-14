@@ -1,10 +1,10 @@
 use std::rc::Rc;
-use serde::{Serialize, Deserialize};
+use serde::Deserialize;
 use fltk::app;
 use enigo::{Enigo, KeyboardControllable, Key};
 use defaults::Defaults;
 
-#[derive(Serialize, Deserialize, Defaults)]
+#[derive(Deserialize, Defaults)]
 #[serde(default, rename_all = "kebab-case")]
 pub struct Typing {
     pub enabled: bool,

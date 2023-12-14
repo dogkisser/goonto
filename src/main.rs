@@ -69,8 +69,6 @@ fn app() -> anyhow::Result<()> {
         )?;
     }
 
-    info!("loaded config: {:?}", serde_yaml::to_string(&cfg)); 
-
     info!("set_run_on_boot: {:?}", set_run_on_boot(cfg.run_on_boot));
 
     let source: Rc<dyn sources::Source> =

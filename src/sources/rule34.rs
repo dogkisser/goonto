@@ -5,12 +5,10 @@ use std::thread;
 use std::sync::{Arc, Mutex};
 use std::path::Path;
 use serde::Deserialize;
-use log::error;
 use futures::{stream, StreamExt};
 
 use crate::sources;
 use crate::config::ImageRes;
-use crate::dialog;
 
 #[derive(Debug)]
 pub struct Rule34 {

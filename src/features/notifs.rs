@@ -1,9 +1,9 @@
 use std::rc::Rc;
-use serde::{Serialize, Deserialize};
+use serde::Deserialize;
 use fltk::app;
 use defaults::Defaults;
 
-#[derive(Serialize, Deserialize, Defaults)]
+#[derive(Deserialize, Defaults)]
 #[serde(default)]
 pub struct Notifs {
     pub enabled: bool,
