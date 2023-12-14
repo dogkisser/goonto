@@ -16,10 +16,10 @@
 | Popup mitosis       |      ✅      |     ✅     |
 | Lowkey mode         |      ✅      |     ✅     |
 | Drive filler        |      ✅      |     ✅     |
+| Discord activity    |      ✅      |     ✅     |
 | Popup censoring     |      ✅      |     ❌     |
 | Video popups        |      ✅      |     ❌     |
 | GUI configuration   |      ✅      |     ❌     |
-| Discord activity    |      ✅      |     ❌     |
 | Audio               |      ✅      |     ❌     |
 | Prompts             |      ✅      |     ❌     |
 | "Hibernate" mode    |      ✅      |     ❌     |
