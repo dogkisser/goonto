@@ -22,6 +22,8 @@ jobs:
       
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "goonto-build-cache"
 
       - name: install build deps
         run: >
