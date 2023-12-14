@@ -5,15 +5,13 @@ use std::thread;
 use std::sync::{Arc, Mutex};
 use std::path::Path;
 use serde::Deserialize;
-use log::error;
 use futures::{stream, StreamExt};
 
 use crate::sources;
 use crate::config::ImageRes;
-use crate::dialog;
 
 #[derive(Debug)]
-pub struct Rule34 {
+pub struct Realbooru {
     images: Arc<Mutex<Vec<String>>>,
     first_person: Vec<String>,
     third_person: Vec<String>,
@@ -30,7 +28,7 @@ struct Post {
     sample_url: String,
 }
 
-impl Rule34 {
+impl Realbooru {
     pub fn new(cfg: &crate::Config) -> anyhow::Result<Self> {
         let (first, third) = crate::sources::get_babble(cfg);
         let r = Self {
@@ -52,7 +50,7 @@ impl Rule34 {
     }
 }
 
-impl sources::Source for Rule34 {
+impl sources::Source for Realbooru {
     fn first_person(&self) -> String {
         crate::sources::random_from(&self.first_person)
     }
@@ -76,7 +74,7 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool)
             continue;
         }
 
-        let mut url = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=10&tags=sort:random -animated "
+        let mut url = "https://realbooru.com/index.php?page=dapi&s=post&q=index&limit=10&tags=sort:random -animated "
             .to_string();
         url.push_str(&crate::sources::random_from(&tags));
 

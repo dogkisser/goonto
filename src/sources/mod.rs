@@ -1,11 +1,13 @@
 use rand::prelude::{IteratorRandom, SliceRandom};
 
 mod e621;
-mod rule34;
-mod local;
 pub use e621::E621;
+mod rule34;
 pub use rule34::Rule34;
+mod local;
 pub use local::Local;
+mod realbooru;
+pub use realbooru::Realbooru;
 
 pub trait Source: Send + Sync {
     fn image(&self) -> String;

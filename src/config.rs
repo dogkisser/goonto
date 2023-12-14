@@ -37,6 +37,8 @@ pub enum Booru {
     E621,
     #[serde(rename = "rule34.xxx")]
     Rule34,
+    #[serde(rename = "realbooru.com")]
+    Realbooru,
 }
 
 #[derive(Serialize, Deserialize, Default, PartialEq)]

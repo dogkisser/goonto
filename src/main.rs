@@ -1,18 +1,19 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![warn(clippy::suspicious, clippy::complexity, clippy::style, clippy::perf)]
+#![feature(panic_update_hook)]
 use std::time::Duration;
 use std::{rc::Rc, time::Instant};
 use std::path::Path;
 use fltk::app;
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey, Modifiers, Code}};
-use log::{LevelFilter, info};
+use log::{LevelFilter, error, info};
 
 mod config;
 mod sources;
 mod features;
 use crate::config::Config;
 
-fn dialog(msg: &str) {
+pub fn dialog(msg: &str) {
     fltk::dialog::message(
         (app::screen_size().0 / 2.0) as i32,
         (app::screen_size().1 / 2.0) as i32, msg);
@@ -56,6 +57,11 @@ fn app() -> anyhow::Result<()> {
             simplelog::Config::default(),
             std::fs::File::create("goonto.log")?
         )?;
+
+        std::panic::update_hook(move |prev, info| {
+            error!("Panic: {:?}", info);
+            prev(info);
+        });
     } else {
         simplelog::SimpleLogger::init(
             LevelFilter::Info,
@@ -76,6 +82,7 @@ fn app() -> anyhow::Result<()> {
             match cfg.image_source.web.booru {
                 Booru::E621 => Rc::new(sources::E621::new(&cfg)?),
                 Booru::Rule34 => Rc::new(sources::Rule34::new(&cfg)?),
+                Booru::Realbooru => Rc::new(sources::Realbooru::new(&cfg)?),
             }
         };
 
