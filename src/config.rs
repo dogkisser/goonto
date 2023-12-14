@@ -75,7 +75,7 @@ impl Config {
     }
 
     pub fn save(&self) -> Result<()> {
-        let sample = include_str!("../goonto.yml");
+        let sample = include_str!("../res/goonto.yml");
         let path = std::env::current_exe().unwrap().parent().unwrap().join("goonto.yml");
         std::fs::write(path, sample)?;
         Ok(())
