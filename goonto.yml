@@ -70,8 +70,9 @@ effects:
     # Whether to include a link to Goonto under the description text.
     # Every time somebody turns this off, a kitten dies.
     shill: true
-    # Overrides the default details text ("Stroking their brains out~")
-    description:
+    # Changes the default status text. This is the first line in the embed, the second line is
+    # controlled by the lines in babble.first-person.
+    status:
 
   # Sends system notifications
   notifs:
@@ -93,7 +94,7 @@ effects:
 # Strings to use for notifications, typing, and clipboard text.
 # If this is empty, a default list is used. Otherwise, only these strings are used.
 babble:
-  # These are from the perspective of the user - used for typing.
+  # These are from the perspective of the user - used for typing and Discord rich presence.
   first-person:
   # - Thank you for existing, Furry Porn.
   # - I am so fucking horny right now...
