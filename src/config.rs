@@ -9,6 +9,7 @@ use crate::features::*;
 pub struct Config {
     pub run_on_boot: bool,
     pub save_logs: bool,
+    pub minimum_run_time: u64,
     pub image_source: ImageSource,
     pub effects: Effects,
     pub babble: Babble,

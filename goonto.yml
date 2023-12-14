@@ -6,9 +6,13 @@
 
 # Whether Goonto should run automatically when your computer starts.
 run-on-boot: false
+
 # Whether to write logs to a goonto.log file. Useful if something is going wrong, but you can
 # generally leave this off.
 save-logs: false
+
+# The minimum amount of time Goonto must run before it will obey the quit keybind (in milliseconds).
+minimum-run-time: 0
 
 # This configures where Goonto will get its images from.
 # You can either use the internet ("web") or local images ("local"). If the "local" key is
@@ -82,7 +86,7 @@ effects:
   # Automatically types for you
   typing:
     enabled: true
-    rate: 10000
+    rate: 30000
     # Whether it should press enter for you, too.
     press-enter: false
   

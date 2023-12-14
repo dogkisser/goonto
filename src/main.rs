@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![warn(clippy::suspicious, clippy::complexity, clippy::style, clippy::perf)]
-use std::rc::Rc;
+use std::time::Duration;
+use std::{rc::Rc, time::Instant};
 use std::path::Path;
 use fltk::app;
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey, Modifiers, Code}};
@@ -46,6 +47,7 @@ fn main() {
 }
 
 fn app() -> anyhow::Result<()> {
+    let started_at = Instant::now();
     let cfg = Config::load()?;
 
     if cfg.save_logs {
@@ -104,8 +106,11 @@ fn app() -> anyhow::Result<()> {
     }
 
     loop {
+        let min_run_time = Duration::from_millis(cfg.minimum_run_time);
         app::wait_for(100.)?;
-        if GlobalHotKeyEvent::receiver().try_recv().is_ok() {
+        if GlobalHotKeyEvent::receiver().try_recv().is_ok()
+            && Instant::now().duration_since(started_at) > min_run_time
+        {
             std::process::exit(0);
         }
     }

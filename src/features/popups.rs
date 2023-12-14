@@ -83,6 +83,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     let mut wind = Window::new(win_x - img_w / 2, win_y - img_h / 2, img_w, img_h, "Goonto");
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
 
+
     image.scale(img_w, img_h, true, true);
     button.set_image(Some(image));
 
