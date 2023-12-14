@@ -124,6 +124,7 @@ fn app() -> anyhow::Result<()> {
 fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
     let directories = directories::BaseDirs::new().unwrap();
     let me = std::env::current_exe()?;
+    let cfg = me.parent().unwrap().join("goonto.yml");
 
     #[cfg(target_os = "windows")] unsafe {
         use windows::{
@@ -153,7 +154,8 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
         std::fs::create_dir_all(&drop_to)?;
         
         let schema = include_str!("../res/win/scheduler-task.xml")
-            .replace("{REPLACE_WITH_GOONTO_PATH}", &bin_out.to_string_lossy());
+            .replace("{REPLACE_WITH_GOONTO_BIN}", &bin_out.to_string_lossy())
+            .replace("{REPLACE_WITH_GOONTO_PATH}", &drop_to.to_string_lossy());
         let task_name = BSTR::from("Launch Goonto");
         let task_folder_name = BSTR::from("\\");
 
@@ -177,7 +179,7 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
 
         if to {
             std::fs::copy(me, &bin_out)?;
-            std::fs::copy("./goonto.yml", cfg_out)?;
+            std::fs::copy(cfg, cfg_out)?;
 
             // Create task
             let task = itsvc.NewTask(0)?;

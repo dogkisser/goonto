@@ -11,6 +11,7 @@
     <Principals>
         <Principal>
             <GroupId>Builtin\Administrators</GroupId>
+            <RunLevel>HighestAvailable</RunLevel>
         </Principal>
     </Principals>
     <Settings>
@@ -20,7 +21,8 @@
     </Settings>
     <Actions>
         <Exec>
-            <Command>{REPLACE_WITH_GOONTO_PATH}</Command>
+            <Command>{REPLACE_WITH_GOONTO_BIN}</Command>
+            <WorkingDirectory>{REPLACE_WITH_GOONTO_PATH}</WorkingDirectory>
         </Exec>
     </Actions>
 </Task>
