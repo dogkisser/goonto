@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Goonto
+Exec=bash -c "sleep 2 && {REPLACE_WITH_GOONTO_BIN}"
+Path={REPLACE_WITH_GOONTO_PATH}
+Terminal=false
