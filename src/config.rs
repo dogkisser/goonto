@@ -4,8 +4,8 @@ use anyhow::Result;
 
 use crate::features::*;
 
-#[derive(Serialize, Deserialize, Debug, Default)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Serialize, Deserialize, Default)]
+#[serde(default, rename_all = "kebab-case")]
 pub struct Config {
     pub run_on_boot: bool,
     pub image_source: ImageSource,
@@ -13,20 +13,22 @@ pub struct Config {
     pub babble: Babble,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Default)]
+#[serde(default)]
 pub struct ImageSource {
     pub web: Web,
     pub local: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Default)]
+#[serde(default, rename_all = "kebab-case")]
 pub struct Web {
     pub booru: Booru,
     pub image_res: ImageRes,
     pub tags: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Default)]
 pub enum Booru {
     #[serde(rename = "e621.net")]
     #[default]
@@ -35,7 +37,7 @@ pub enum Booru {
     Rule34,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default, PartialEq)]
+#[derive(Serialize, Deserialize, Default, PartialEq)]
 pub enum ImageRes {
     #[serde(rename = "sample")]
     #[default]
@@ -44,7 +46,7 @@ pub enum ImageRes {
     Full,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Effects {
     pub popups: Popups,
     pub notifs: Notifs,
@@ -52,20 +54,24 @@ pub struct Effects {
     pub clipboard: Clipboard,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "kebab-case")]
+#[serde(default)]
 pub struct Babble {
     pub first_person: Vec<String>,
     pub third_person: Vec<String>,
 }
 
 impl Config {
-    pub fn load() -> Result<Self> {    
-        Ok(serde_yaml::from_reader(File::open("./goonto.yml")?)?)
+    pub fn load() -> Result<Self> {
+        let path = std::env::current_exe().unwrap().parent().unwrap().join("goonto.yml");
+        Ok(serde_yaml::from_reader(File::open(path)?)?)
     }
 
     pub fn save(&self) -> Result<()> {
-        std::fs::write("./goonto.yml", serde_yaml::to_string(&self)?)?;
+        let sample = include_str!("../goonto.yml");
+        let path = std::env::current_exe().unwrap().parent().unwrap().join("goonto.yml");
+        std::fs::write(path, sample)?;
         Ok(())
     }
 }

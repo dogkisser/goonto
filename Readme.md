@@ -1,11 +1,4 @@
-# goonto
-
-**the quit keybind is control + backspace**
-
-- ci should really be caching
-- i bet stocktake() crashes if the network connection is dodgy
-- site is broken for the period of CI building a new release
-- limit the number of popups on screen and slowly replace them over time
+# Goonto
 
 | **Feature**         | **Edgeware** | **Goonto** |
 | ------------------- | ------------ | ---------- |
@@ -21,17 +14,15 @@
 | Popups              |      ✅      |     ✅     |
 | Popup opacity       |      ✅      |     ✅     |
 | Popup mitosis       |      ✅      |     ✅     |
+| Lowkey mode         |      ✅      |     ✅     |
+| Drive filler        |      ✅      |     ✅     |
 | Popup censoring     |      ✅      |     ❌     |
 | Video popups        |      ✅      |     ❌     |
-| Drive filler        |      ✅      |     ❌     |
 | GUI configuration   |      ✅      |     ❌     |
 | Discord activity    |      ✅      |     ❌     |
 | Audio               |      ✅      |     ❌     |
 | Prompts             |      ✅      |     ❌     |
-| "Hibernate" mode    |      ✅      |     👮     |
-| Lowkey mode         |      ✅      |     👮     |
+| "Hibernate" mode    |      ✅      |     ❌     |
 | Wallpaper changer   |      ✅      |     ❌     |
 | Walltaker support   |      ❌      |     ❌     |
 | Text-to-speech      |      ❌      |     ❌     |
-
-Things marked 👮 are likely not coming to Goonto, but another, seperate program. :)

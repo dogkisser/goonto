@@ -1,4 +1,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![warn(clippy::suspicious, clippy::complexity, clippy::style, clippy::perf)]
 use std::rc::Rc;
 use std::path::Path;
 use fltk::app;

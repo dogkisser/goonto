@@ -3,32 +3,42 @@ use std::sync::{Mutex, OnceLock};
 use fltk::{prelude::*, app, window::Window, button::Button, image::SharedImage};
 use serde::{Serialize, Deserialize};
 use rand::Rng;
+use defaults::Defaults;
 
 // Not a great implementation but it's really easy and safe
 static COUNT: OnceLock<Mutex<u64>> = OnceLock::new();
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Serialize, Deserialize, Clone, Copy, Defaults)]
+#[serde(default, rename_all = "kebab-case")]
 pub struct Popups {
+    #[def = "true"]
     pub enabled: bool,
+    #[def = "2_000"]
     rate: u64,
+    #[def = "true"]
     closable: bool,
     closes_after: u64,
-    click_through: bool,
     max: u64,
+    click_through: bool,
     opacity: Opacity,
     mitosis: Mitosis,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Clone, Copy, Defaults)]
+#[serde(default)]
 pub struct Mitosis {
+    #[def = "30"]
     chance: u16,
+    #[def = "5"]
     max: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Clone, Copy, Defaults)]
+#[serde(default)]
 pub struct Opacity {
+    #[def = "70"]
     from: u16,
+    #[def = "100"]
     to: u16,
 }
 
@@ -44,25 +54,6 @@ impl Popups {
         });
     }
 }
-
-impl Default for Popups {
-    fn default() -> Self {
-        Self {
-            enabled: true,
-            rate: 1_500,
-            closable: true,
-            closes_after: 60_000,
-            click_through: false,
-            max: 0,
-            opacity: Opacity { from: 30, to: 100 },
-            mitosis: Mitosis {
-                chance: 20,
-                max: 3,
-            },
-        }
-    }
-}
-
 
 /* Returns the number of new popups to create immediately */
 fn new_popup<T: crate::sources::Source + 'static + ?Sized>(

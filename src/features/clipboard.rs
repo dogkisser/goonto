@@ -1,10 +1,13 @@
 use std::rc::Rc;
 use serde::{Serialize, Deserialize};
-use fltk::{app};
+use fltk::app;
+use defaults::Defaults;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Defaults)]
+#[serde(default)]
 pub struct Clipboard {
     pub enabled: bool,
+    #[def = "10_000"]
     rate: u128,
 }
 
@@ -17,14 +20,5 @@ impl Clipboard {
             
             app::repeat_timeout3(rate, handle);
         });
-    }
-}
-
-impl Default for Clipboard {
-    fn default() -> Self {
-        Self {
-            enabled: true,
-            rate: 10_000,
-        }
     }
 }

@@ -1,12 +1,14 @@
 use std::rc::Rc;
 use serde::{Serialize, Deserialize};
-use fltk::{app};
+use fltk::app;
 use enigo::{Enigo, KeyboardControllable, Key};
+use defaults::Defaults;
 
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Serialize, Deserialize, Defaults)]
+#[serde(default, rename_all = "kebab-case")]
 pub struct Typing {
     pub enabled: bool,
+    #[def = "120_000"]
     rate: u128,
     press_enter: bool,
 }
@@ -36,15 +38,5 @@ fn block_input(should: bool) {
         use windows::Win32::UI::Input::KeyboardAndMouse::BlockInput;
         
         let _ = BlockInput(should);
-    }
-}
-
-impl Default for Typing {
-    fn default() -> Self {
-        Self {
-            enabled: true,
-            rate: 30_000,
-            press_enter: false,
-        }
     }
 }

@@ -1,4 +1,4 @@
 #include <Windows.h>
 
-1 ICON "goonto_alt.ico"
+1 ICON "goonto.ico"
 CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "goonto.exe.manifest"

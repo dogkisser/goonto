@@ -19,6 +19,7 @@ fltk = { version = "1.4.16", features = ["no-pango"] }
 # I don't THINK FLTK has a way to do this
 global-hotkey = "0.4.0"
 single-instance = "0.3.3"
+defaults = "0.2.0"
 
 [dependencies.reqwest]
 version = "0.11"

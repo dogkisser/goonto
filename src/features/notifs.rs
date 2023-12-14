@@ -1,10 +1,13 @@
 use std::rc::Rc;
 use serde::{Serialize, Deserialize};
-use fltk::{app};
+use fltk::app;
+use defaults::Defaults;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Defaults)]
+#[serde(default)]
 pub struct Notifs {
     pub enabled: bool,
+    #[def = "30_000"]
     rate: u128,
 }
 
@@ -25,14 +28,5 @@ impl Notifs {
             
             app::repeat_timeout3(rate, handle);
         });
-    }
-}
-
-impl Default for Notifs {
-    fn default() -> Self {
-        Self {
-            enabled: true,
-            rate: 15_000,
-        }
     }
 }

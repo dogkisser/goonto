@@ -400,6 +400,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "defaults"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40e9553d64f91aa22cb23a558a19108bce0f6854ef99a123b8c0a9b95a9ba267"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "deranged"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -789,6 +800,7 @@ name = "goonto"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "defaults",
  "directories",
  "embed-resource",
  "enigo",

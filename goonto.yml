@@ -1,5 +1,7 @@
 # Example Goonto configuration.
 # Everything past the hash symbol (#) is a comment, and is ignored.
+# Everything except popups are off by default, with most other settings at sane defaults.
+# So feel free to have a minimal configuration that only changes what you want changed.
 
 # Whether Goonto should run automatically when your computer starts.
 # This only works on Windows :)
@@ -15,7 +17,7 @@ image-source:
     # particularly with high rates or slow connections, but you may want to use "full" in case
     # you see images you like and want to save them.
     # Samples are more than high-res enough to look good in popups.
-    image_res: full
+    image-res: full
     # The booru to get images from. "e621.net" and "rule34.xxx" are supported.
     booru: e621.net
     # Tags to use to query boorus. Each line (beginning with a hyphen) is an individual query,
@@ -45,7 +47,7 @@ effects:
     closes-after: 3000
     # Maximum number of popups that can be open at once
     # 0 == unlimited
-    max: 0
+    # max: 0
     # Whether clicking on a popup clicks the popup or the window underneath it.
     # "true" effectively disables closeable.
     click-through: false
@@ -68,9 +70,9 @@ effects:
   # Automatically types for you
   typing:
     enabled: true
-    rate: 3000
+    rate: 10000
     # Whether it should press enter for you, too.
-    press-enter: true
+    press-enter: false
   
   # Overwrites your clipboard
   clipboard:
