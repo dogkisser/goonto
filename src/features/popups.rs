@@ -80,7 +80,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     let (img_w, img_h) = reasonable_size(&image);
     let (win_x, win_y) = window_position();
 
-    let mut wind = Window::new(win_x - img_w / 2, win_y - img_h / 2, img_w, img_h, "Goonto");
+    let mut wind = Window::new(win_x - (img_w / 2), win_y - (img_h / 2), img_w, img_h, "Goonto");
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
 
 
@@ -193,34 +193,34 @@ fn make_window_clickthrough(handle: fltk::window::RawHandle) {
     }
 }
 
-fn display_size() -> (i32, i32) {
+// FLTK uses 0 as the top left of the primary monitor, with monitors to the left having negative
+// coordinates. So this returns ((min_x, max_x), max_y)
+fn display_size() -> ((i32, i32), i32) {
     let mut geometries = Vec::new();
     for i in 0..app::screen_count() {
         geometries.push(app::screen_xywh(i));
     }
 
-    /* SAFETY: All of these vecs contain at least one element, and are ord */
-    let x0 = geometries.iter().map(|m| m.0).min().unwrap();
-    let y0 = geometries.iter().map(|m| m.1).min().unwrap();
-    let x1 = geometries.iter().map(|m| m.0 + m.2).max().unwrap();
-    let y1 = geometries.iter().map(|m| m.1 + m.3).max().unwrap();
+    let min_x = geometries.iter().map(|m| m.0).min().unwrap();
+    let max_x = geometries.iter().map(|m| m.2).max().unwrap();
+    let y = geometries.iter().map(|m| m.3).max().unwrap();
 
-    (x1 - x0, y1 - y0)
+    ((min_x, max_x), y)
 }
 
 fn window_position() -> (i32, i32) {
-    let (mon_w, mon_h) = display_size();
+    let ((min_x, max_x), max_y) = display_size();
 
-    (rand::thread_rng().gen_range(0..mon_w), rand::thread_rng().gen_range(0..mon_h))
+    (rand::thread_rng().gen_range(min_x..max_x), rand::thread_rng().gen_range(0..max_y))
 }
 
 fn reasonable_size(image: &SharedImage) -> (i32, i32) {
-    let (mon_w, mon_h) = display_size();
+    let ((_, max_x), mon_h) = display_size();
     let img_w = image.w();
     let img_h = image.h();
 
     let ratio = f32::min(
-        mon_w as f32 / img_w as f32,
+        max_x as f32 / img_w as f32,
         mon_h as f32 / img_h as f32) / 3.;
 
     ((img_w as f32 * ratio) as i32,
