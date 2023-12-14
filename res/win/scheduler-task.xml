@@ -6,6 +6,7 @@
     <Triggers>
         <LogonTrigger>
             <Enabled>true</Enabled>
+            <Delay>PT15S</Delay>
         </LogonTrigger>
     </Triggers>
     <Principals>
