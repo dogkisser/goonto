@@ -29,7 +29,7 @@ image-source:
     # This is a collection of tags added to every query. The default is
     # "score:>300 rating:e", which is generally fine in 99% of cases. But if you'd like
     # to see SFW or low-score posts, you may want to change it.
-    tag-prefix:
+    # tag-prefix:
     # Tags to use to query boorus. Each line (beginning with a hyphen) is an individual query,
     # i.e., every tag on a given line will be used as part of the search.
     tags:
