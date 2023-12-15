@@ -47,7 +47,7 @@ impl Discord {
 
             if self.shill {
                 activity = activity.buttons(vec![
-                    Button::new("Join them~", "https://zoomasochist.github.io")]
+                    Button::new("Join me~", "https://zoomasochist.github.io")]
                 );
             }
 
