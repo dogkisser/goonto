@@ -41,9 +41,10 @@ impl Rule34 {
 
         let tags = cfg.image_source.web.tags.clone();
         let full_res = cfg.image_source.web.image_res == ImageRes::Full;
+        let prefix = cfg.image_source.web.tag_prefix.clone();
         thread::spawn({
             let clone = Arc::clone(&r.images);
-            move || { let _ = stocktake(tags, clone, full_res); }
+            move || { let _ = stocktake(tags, clone, full_res, &prefix); }
         });
 
         Ok(r)
@@ -65,7 +66,7 @@ impl sources::Source for Rule34 {
 }
 
 /* TODO: hacky in general */
-fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool)
+fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool, prefix: &str)
     -> anyhow::Result<()>
 {
     tokio::runtime::Runtime::new().unwrap().block_on(async { loop {
@@ -74,9 +75,8 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool)
             continue;
         }
 
-        let mut url = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=10&tags=sort:random -animated "
-            .to_string();
-        url.push_str(&crate::sources::random_from(&tags));
+        let url = format!("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=10&tags=sort:random -animated {} {}",
+            prefix, crate::sources::random_from(&tags));
 
         let client = reqwest::Client::new();
 

@@ -1,6 +1,7 @@
 use std::fs::File;
 use serde::Deserialize;
 use anyhow::Result;
+use defaults::Defaults;
 
 use crate::features::*;
 
@@ -22,11 +23,13 @@ pub struct ImageSource {
     pub local: String,
 }
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Defaults)]
 #[serde(default, rename_all = "kebab-case")]
 pub struct Web {
     pub booru: Booru,
     pub image_res: ImageRes,
+    #[def = "String::from(\"rating:e score:>300\")"]
+    pub tag_prefix: String,
     pub tags: Vec<String>,
 }
 

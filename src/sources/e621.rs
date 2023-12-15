@@ -46,9 +46,10 @@ impl E621 {
 
         let tags = cfg.image_source.web.tags.clone();
         let full_res = cfg.image_source.web.image_res == ImageRes::Full;
+        let prefix = cfg.image_source.web.tag_prefix.clone();
         thread::spawn({
             let clone = Arc::clone(&r.images);
-            move || { let _ = stocktake(tags, clone, full_res); }
+            move || { let _ = stocktake(tags, clone, full_res, &prefix); }
         });
 
         Ok(r)
@@ -71,7 +72,7 @@ impl sources::Source for E621 {
 }
 
 /* TODO: hacky in general */
-fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool)
+fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool, prefix: &str)
     -> anyhow::Result<()>
 {
     tokio::runtime::Runtime::new().unwrap().block_on(async { loop {
@@ -80,9 +81,8 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool)
             continue;
         }
 
-        let mut url = "https://e621.net/posts.json?limit=25&tags=-animated rating:e order:random score:>300 "
-            .to_string();
-        url.push_str(&crate::sources::random_from(&tags));
+        let url = format!("https://e621.net/posts.json?limit=25&tags=-animated order:random {} {}",
+            prefix, crate::sources::random_from(&tags));
 
         let client = reqwest::Client::new();
 
