@@ -191,6 +191,21 @@ fn make_window_clickthrough(handle: fltk::window::RawHandle) {
             (current_style | WS_EX_TRANSPARENT.0 | WS_EX_LAYERED.0) as i32,
         );
     }
+
+    #[cfg(target_os = "linux")] unsafe {
+        use x11::{
+            xlib::{XRectangle, XOpenDisplay, XCloseDisplay},
+            xfixes::{XFixesSetWindowShapeRegion, XFixesDestroyRegion, XFixesCreateRegion},
+        };
+
+        let display = XOpenDisplay(std::ptr::null());
+        let mut rectangle = XRectangle { x: 0, y: 0, width: 0, height: 0, };
+        let region = XFixesCreateRegion(display, &mut rectangle, 1);
+
+        XFixesSetWindowShapeRegion(display, handle, 2, 0, 0, region);
+        XFixesDestroyRegion(display, region);
+        XCloseDisplay(display);
+    }
 }
 
 // FLTK uses 0 as the top left of the primary monitor, with monitors to the left having negative
