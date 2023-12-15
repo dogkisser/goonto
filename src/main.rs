@@ -218,7 +218,7 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
             )?;
         } else {
             // Ignore the error because it'd probably be that the service doesn't exist
-            let _ = task_folder.DeleteTask(&task_name, 0);
+            info!("DeleteTask: {:?}", task_folder.DeleteTask(&task_name, 0));
         }
     }
 
