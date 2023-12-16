@@ -8,3 +8,5 @@ mod clipboard;
 pub use clipboard::*;
 mod discord;
 pub use discord::*;
+mod wallpaper;
+pub use wallpaper::*;

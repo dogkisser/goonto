@@ -61,6 +61,7 @@ pub struct Effects {
     pub typing: Typing,
     pub clipboard: Clipboard,
     pub discord: Discord,
+    pub wallpaper: Wallpaper,
 }
 
 #[derive(Deserialize, Default)]

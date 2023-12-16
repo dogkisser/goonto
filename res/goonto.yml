@@ -99,6 +99,13 @@ effects:
     enabled: false
     rate: 5000
 
+  # Changes your wallpaper
+  # When exiting Goonto cleanly (with the exit keybind), your original wallpaper
+  # will be restored.
+  wallpaper:
+    enabled: false
+    rate: 10000
+
 # Strings to use for notifications, typing, and clipboard text.
 # If this is empty, a default list is used. Otherwise, only these strings are used.
 babble:

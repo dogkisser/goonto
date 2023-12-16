@@ -49,7 +49,7 @@ fn main() {
 
 fn app() -> anyhow::Result<()> {
     let started_at = Instant::now();
-    let cfg = Config::load()?;
+    let mut cfg = Config::load()?;
 
     if cfg.save_logs {
         simplelog::WriteLogger::init(
@@ -110,12 +110,17 @@ fn app() -> anyhow::Result<()> {
         cfg.effects.discord.run(Rc::clone(&source));
     }
 
+    if cfg.effects.wallpaper.enabled {
+        cfg.effects.wallpaper.run(Rc::clone(&source));
+    }
+
     loop {
         let min_run_time = Duration::from_millis(cfg.minimum_run_time);
         app::wait_for(100.)?;
         if GlobalHotKeyEvent::receiver().try_recv().is_ok()
             && Instant::now().duration_since(started_at) > min_run_time
         {
+            cfg.effects.wallpaper.exit_hook();
             std::process::exit(0);
         }
     }
@@ -125,10 +130,11 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
     let directories = directories::BaseDirs::new().unwrap();
     let me = std::env::current_exe()?;
     let cfg = me.parent().unwrap().join("goonto.yml");
-    let home = directories.home_dir();
 
     #[cfg(target_os = "linux")]
     if to {
+        let home = directories.home_dir();
+        
         let drop_to = directories.executable_dir().unwrap().join("Goonto");
         let bin_out = drop_to.join("goonto");
         let cfg_out = drop_to.join("goonto.yml");

@@ -2,5 +2,6 @@
 /test
 /goonto-cache
 /goonto.log
+/.vscode
 # Don't ask why this is here
 System Volume Information/
