@@ -156,11 +156,12 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
 
     #[cfg(target_os = "windows")] unsafe {
         use windows::{
-            core::BSTR,
+            core::{PWSTR, BSTR},
             Win32::{
                 Security::PSECURITY_DESCRIPTOR,
                 System::{
                     Variant::VariantInit,
+                    WindowsProgramming::GetUserNameW,
                     TaskScheduler::{
                         TASK_CREATE_OR_UPDATE, TASK_LOGON_GROUP,
                         TaskScheduler,
@@ -178,12 +179,23 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
         let drop_to = directories.config_dir().join("Goonto");
         let bin_out = drop_to.join("goonto.exe");
         let cfg_out = drop_to.join("goonto.yml");
-        
+
         std::fs::create_dir_all(&drop_to)?;
         
+        let mut size: u32 = 100;
+        let mut username = Vec::with_capacity(size as usize);
+        GetUserNameW(PWSTR(username.as_mut_ptr()), &mut size)?;
+        username.set_len(size as usize);
+
+        let username = String::from_utf16(username.as_slice())?;
+        let username = username.trim_matches('\0');
+
+        info!("[Run on Boot] using username '{username}' for task");
+
         let schema = include_str!("../res/win/scheduler-task.xml")
             .replace("{REPLACE_WITH_GOONTO_BIN}", &bin_out.to_string_lossy())
-            .replace("{REPLACE_WITH_GOONTO_PATH}", &drop_to.to_string_lossy());
+            .replace("{REPLACE_WITH_GOONTO_PATH}", &drop_to.to_string_lossy())
+            .replace("{REPLACE_WITH_USERNAME}", username);
         let task_name = BSTR::from("Launch Goonto");
         let task_folder_name = BSTR::from("\\");
 

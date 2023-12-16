@@ -6,6 +6,7 @@
     <Triggers>
         <LogonTrigger>
             <Enabled>true</Enabled>
+            <UserId>{REPLACE_WITH_USERNAME}</UserId>
             <Delay>PT15S</Delay>
         </LogonTrigger>
     </Triggers>
