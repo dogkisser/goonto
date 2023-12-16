@@ -131,27 +131,27 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
     let me = std::env::current_exe()?;
     let cfg = me.parent().unwrap().join("goonto.yml");
 
-    #[cfg(target_os = "linux")]
-    if to {
+    #[cfg(target_os = "linux")] {
         let home = directories.home_dir();
-        
-        let drop_to = directories.executable_dir().unwrap().join("Goonto");
-        let bin_out = drop_to.join("goonto");
-        let cfg_out = drop_to.join("goonto.yml");
-        
-        let desktop = include_str!("../res/linux/Goonto.desktop")
-            .replace("{REPLACE_WITH_GOONTO_BIN}",  &bin_out.to_string_lossy())
-            .replace("{REPLACE_WITH_GOONTO_PATH}", &drop_to.to_string_lossy());
-        
-        std::fs::create_dir_all(drop_to)?;
-        std::fs::create_dir_all(home.join(".config/autostart"))?;
-        
-        std::fs::copy(me,  bin_out)?;
-        std::fs::copy(cfg, cfg_out)?;
-        
-        std::fs::write(home.join(".config/autostart/Goonto.desktop"), &desktop)?;
-    } else {
-        let _ = std::fs::remove_file(home.join(".config/autostart/Goonto.desktop"));
+        if to {
+            let drop_to = directories.executable_dir().unwrap().join("Goonto");
+            let bin_out = drop_to.join("goonto");
+            let cfg_out = drop_to.join("goonto.yml");
+            
+            let desktop = include_str!("../res/linux/Goonto.desktop")
+                .replace("{REPLACE_WITH_GOONTO_BIN}",  &bin_out.to_string_lossy())
+                .replace("{REPLACE_WITH_GOONTO_PATH}", &drop_to.to_string_lossy());
+            
+            std::fs::create_dir_all(drop_to)?;
+            std::fs::create_dir_all(home.join(".config/autostart"))?;
+            
+            std::fs::copy(me,  bin_out)?;
+            std::fs::copy(cfg, cfg_out)?;
+            
+            std::fs::write(home.join(".config/autostart/Goonto.desktop"), &desktop)?;
+        } else {
+            let _ = std::fs::remove_file(home.join(".config/autostart/Goonto.desktop"));
+        }
     }
 
     #[cfg(target_os = "windows")] unsafe {
