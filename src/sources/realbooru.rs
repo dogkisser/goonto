@@ -76,9 +76,7 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool,
         }
 
         let url = format!("https://realbooru.com/index.php?page=dapi&s=post&q=index&limit=10&tags=-animated order:random {} {}",
-            prefix, crate::sources::random_from(&tags))
-            // stoopid realbooru
-            .replace("rating:e", "rating:explicit");
+            prefix, crate::sources::random_from(&tags));
 
         let client = reqwest::Client::new();
 
