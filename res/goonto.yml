@@ -7,11 +7,12 @@
 # Whether Goonto should run automatically when your computer starts.
 run-on-boot: false
 
-# Whether to write logs to a goonto.log file. Useful if something is going wrong, but you can
-# generally leave this off.
+# Whether to write logs to a goonto.log file. Useful if something is going wrong, but you
+# can generally leave this off.
 save-logs: false
 
-# The minimum amount of time Goonto must run before it will obey the quit keybind (in milliseconds).
+# The minimum amount of time Goonto must run before it will obey the quit keybind
+# (in milliseconds).
 minimum-run-time: 0
 
 # This configures where Goonto will get its images from.
@@ -19,26 +20,27 @@ minimum-run-time: 0
 # a valid path, that is used, overriding web.
 image-source:
   web:
-    # Whether to download "sample" or "full" resolution images. Samples may be significantly faster,
-    # particularly with high rates or slow connections, but you may want to use "full" in case
-    # you see images you like and want to save them.
+    # Whether to download "sample" or "full" resolution images. Samples may be
+    # significantly faster, particularly with high rates or slow connections, but you may
+    # want to use "full" in case you see images you like and want to save them.
     # Samples are more than high-res enough to look good in popups.
     image-res: sample
-    # The booru to get images from. "e621.net", "realbooru.com", and "rule34.xxx" are supported.
+    # The booru to get images from. "e621.net", "realbooru.com", and "rule34.xxx" are
+    # supported.
     booru: e621.net
     # This is a collection of tags added to every query. The default is
-    # "score:>300 rating:e", which is generally fine in 99% of cases. But if you'd like
-    # to see SFW or low-score posts, you may want to change it.
+    # "score:>200 rating:explicit", which is generally fine in 99% of cases. But if you'd
+    # like to see SFW or low-score posts, you may want to change it.
     # tag-prefix:
-    # Tags to use to query boorus. Each line (beginning with a hyphen) is an individual query,
-    # i.e., every tag on a given line will be used as part of the search.
+    # Tags to use to query boorus. Each line (beginning with a hyphen) is an individual
+    # query, i.e., every tag on a given line will be used as part of the search.
     tags:
       - ~equine ~canine dominant_feral
       - sugarlesspaints zebra -comic
       - zackary911
 
-  # Leave this empty to use web. Put a path here to use images from a folder on your computer.
-  # Overrides web.
+  # Leave this empty to use web. Put a path here to use images from a folder on your
+  # computer. Overrides web.
   local:
   # local: C:\Users\gooner69\Desktop\tax-details\2014\backup
 
@@ -78,8 +80,8 @@ effects:
     # Whether to include a link to Goonto under the description text.
     # Every time somebody turns this off, a kitten dies.
     shill: true
-    # Changes the default status text. This is the first line in the embed, the second line is
-    # controlled by the lines in babble.first-person.
+    # Changes the default status text. This is the first line in the embed, the second
+    # line is controlled by the lines in babble.first-person.
     status:
 
   # Sends system notifications
@@ -109,14 +111,15 @@ effects:
 # Strings to use for notifications, typing, and clipboard text.
 # If this is empty, a default list is used. Otherwise, only these strings are used.
 babble:
-  # These are from the perspective of the user - used for typing and Discord rich presence.
+  # These are from the perspective of the user - used for typing and Discord rich
+  # presence.
   first-person:
   # - Thank you for existing, Furry Porn.
   # - I am so fucking horny right now...
   # - I'm addicted to the feeling of letting go and giving into my desires.
 
-  # These are from the perspective of somebody talking to the user - used for notifications and
-  # the clipboard.
+  # These are from the perspective of somebody talking to the user - used for
+  # notifications and the clipboard.
   third-person:
   # - Your body is a temple for PORN, worship it and be consumed by it.
   # - Don't cum, be a good pump puppy.
