@@ -1,5 +1,14 @@
 # Goonto
 
+## Why?
+
+Goonto is very similar to Edgeware, but:
+
+- works on Linux and macOS
+- is simpler to configure
+- doesn't need packs
+- is a single compiled binary with no dependencies (i.e. Python)
+
 ## Feature Matrix
 
 | **Feature**         | **Competitors**† | **Goonto** |
