@@ -25,7 +25,12 @@ impl Local {
         let source = cfg.image_source.local.clone();
         thread::spawn({
             let clone = Arc::clone(&r.images);
-            move || { stocktake(source, clone); }
+            move || loop {
+                if let Err(e) = stocktake(&source, &clone) {
+                    crate::dialog(&format!("Stocktaking failed: {:?}\nTrying again.", e));
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                }
+            }
         });
 
         Ok(r)
@@ -47,18 +52,26 @@ impl sources::Source for Local {
 }
 
 // TODO: make safer etc
-fn stocktake(source: String, images: Arc<Mutex<Vec<String>>>) {
-    std::fs::read_dir(source)
-        .unwrap()
-        .for_each(|path| {
-            let path = path.unwrap();
+fn stocktake(source: &str, images: &Arc<Mutex<Vec<String>>>) -> anyhow::Result<()> {
+    std::fs::read_dir(source)?
+        .map(|path| {
+            let path = path?;
             
-            if is_file(&path) && allowed_extension(&path) {
+            if is_file(&path)? && allowed_extension(&path) {
                 let path_str = path.path().to_string_lossy().to_string();
 
                 images.lock().unwrap().push(path_str);
             }
+
+            anyhow::Ok(())
+        })
+        .for_each(|res| {
+            if let Err(res) = res {
+                log::warn!("Stocktake error: {:?}", res);
+            }
         });
+    
+    Ok(())
 }
 
 fn allowed_extension(entry: &DirEntry) -> bool {
@@ -70,6 +83,6 @@ fn allowed_extension(entry: &DirEntry) -> bool {
         .is_some_and(|e| allowed.contains(&e.to_string_lossy().to_string().as_str()))
 }
 
-fn is_file(entry: &DirEntry) -> bool {
-    entry.file_type().unwrap().is_file()
+fn is_file(entry: &DirEntry) -> anyhow::Result<bool> {
+    Ok(entry.file_type()?.is_file())
 }

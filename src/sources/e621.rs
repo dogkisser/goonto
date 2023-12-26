@@ -5,7 +5,7 @@ use std::thread;
 use std::sync::{Arc, Mutex};
 use std::path::Path;
 use serde::Deserialize;
-use futures::{stream, StreamExt};
+use futures::stream::{self, StreamExt};
 
 use crate::sources;
 use crate::config::ImageRes;
@@ -49,7 +49,12 @@ impl E621 {
         let prefix = cfg.image_source.web.tag_prefix.clone();
         thread::spawn({
             let clone = Arc::clone(&r.images);
-            move || { let _ = stocktake(tags, clone, full_res, &prefix); }
+            move || loop {
+                if let Err(e) = stocktake(&tags, &clone, full_res, &prefix) {
+                    crate::dialog(&format!("Stocktaking failed: {:?}\nTrying again.", e));
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                }
+            }
         });
 
         Ok(r)
@@ -72,36 +77,31 @@ impl sources::Source for E621 {
 }
 
 /* TODO: hacky in general */
-fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool, prefix: &str)
+fn stocktake(tags: &[String], images: &Arc<Mutex<Vec<String>>>, full_res: bool, prefix: &str)
     -> anyhow::Result<()>
 {
-    tokio::runtime::Runtime::new().unwrap().block_on(async { loop {
+    tokio::runtime::Runtime::new()?.block_on(async { loop {
         if images.lock().unwrap().len() > 25 {
             thread::sleep(Duration::from_secs(1));
             continue;
         }
 
         let url = format!("https://e621.net/posts.json?limit=25&tags=-animated order:random {} {}",
-            prefix, crate::sources::random_from(&tags));
+            prefix, crate::sources::random_from(tags));
 
         let client = reqwest::Client::new();
-
         let resp = client
             .get(url)
             .header(reqwest::header::USER_AGENT, "Goonto/1.0.69")
             .send()
-            .await
-            .unwrap()
+            .await?
             .json::<E6Posts>()
-            .await
-            .unwrap()
-            .posts
-            .into_iter()
-            .filter_map(|p| if full_res { p.file.url } else { p.sample.url })
-            .collect::<Vec<String>>();
-
-        let imagez = &images;
-        let new_images = stream::iter(resp)
+            .await?
+            .posts;
+        
+        stream::iter(resp)
+            .filter_map(|p| async move { if full_res { p.file.url } else { p.sample.url }})
+            /* Image URL -> (path, bytes) */
             .map(|image_url| {
                 let client = &client;
                 let (_, filename) = &image_url.rsplit_once('/').unwrap();
@@ -110,26 +110,34 @@ fn stocktake(tags: Vec<String>, images: Arc<Mutex<Vec<String>>>, full_res: bool,
                 async move {
                     let s = client.get(&image_url)
                         .send()
-                        .await
-                        .unwrap()
+                        .await?
                         .bytes()
-                        .await
-                        .unwrap()
+                        .await?
                         .to_vec();
 
-                    (out_path, s)
+                    anyhow::Ok((out_path, s))
                 }
             })
-            .buffer_unordered(5);
+            /* (path, bytes) -> write out + Result */
+            .map(|img| async move {
+                let (out_path, image_data) = img.await?;
 
-        new_images.for_each(|(out_path, image_data)| async move {
-            let mut outf = File::create(out_path.clone()).unwrap();
-            io::copy(&mut image_data.as_slice(), &mut outf).unwrap();
-            imagez.lock().unwrap().push(out_path.as_path().display().to_string());
-        }).await;
+                let mut outf = File::create(out_path.clone())?;
+                io::copy(&mut image_data.as_slice(), &mut outf)?;
+                images.lock().unwrap().push(out_path.as_path().display().to_string());
+
+                anyhow::Ok(())
+            })
+            .for_each_concurrent(10, |res| async move {
+                let res = res.await;
+                if let Err(_) = res {
+                    log::warn!("Failed to download image: {:?}.", res);
+                };
+            })
+            .await;
 
         thread::sleep(Duration::from_millis(1000));
-    }});
+    }; #[allow(unreachable_code)] anyhow::Ok(()) })?;
 
     Ok(())
 }

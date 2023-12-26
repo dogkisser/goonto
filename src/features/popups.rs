@@ -91,7 +91,8 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
         if cfg.closable {
             /* SAFETY: I _know_ this widget has a window */
             w.window().unwrap().hide();
-            *COUNT.get().unwrap().lock().unwrap() -= 1;
+            let mut c = COUNT.get().unwrap().lock().unwrap();
+            *c = c.saturating_sub(1);
 
             if rand::thread_rng().gen_range(0..100) < cfg.mitosis.chance {
                 for _ in 0..rand::thread_rng().gen_range(0..cfg.mitosis.max) {
@@ -116,7 +117,8 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     if cfg.closes_after > 0 {
         app::add_timeout3(cfg.closes_after as f64 / 1000., move |_handle| {
             wind.hide();
-            *COUNT.get().unwrap().lock().unwrap() -= 1;
+            let mut c = COUNT.get().unwrap().lock().unwrap();
+            *c = c.saturating_sub(1);
         });
     }
 

@@ -114,7 +114,7 @@ fn if_empty<T>(maybe: Vec<T>, fallback: Vec<T>) -> Vec<T> {
     }
 }
 
-fn random_from<T: std::default::Default + Clone>(x: &Vec<T>) -> T {
+fn random_from<T: std::default::Default + Clone>(x: &[T]) -> T {
     if x.is_empty() {
         return T::default()
     }
