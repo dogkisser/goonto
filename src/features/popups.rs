@@ -66,15 +66,13 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     if cfg.max != 0 && *COUNT.get().unwrap().lock().unwrap() >= cfg.max {
         return Ok(())
     }
-    *COUNT.get().unwrap().lock().unwrap() += 1;
-
+    
     let image_path = source.image();
-
+    
     if image_path.is_empty() {
-        *COUNT.get().unwrap().lock().unwrap() -= 1;
         return Ok(())
     }
-            
+    
     let mut image = SharedImage::load(image_path)?;
     let opacity = rand::thread_rng()
         .gen_range(cfg.opacity.from..cfg.opacity.to) as f64 / 100.;
@@ -84,7 +82,6 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
 
     let mut wind = Window::new(win_x - (img_w / 2), win_y - (img_h / 2), img_w, img_h, "Goonto");
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
-
 
     image.scale(img_w, img_h, true, true);
     button.set_image(Some(image));
@@ -103,6 +100,8 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
             }
         }
     });
+
+    *COUNT.get().unwrap().lock().unwrap() += 1;
 
     wind.set_border(false);
     wind.set_callback(|_| { });
