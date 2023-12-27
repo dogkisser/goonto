@@ -48,7 +48,9 @@ impl Popups {
         let rate = self.rate as f64 / 1000.;
 
         app::add_timeout3(rate, move |handle| {
-            let _ = new_popup(Rc::clone(&source), self);
+            if let Err(e) = new_popup(Rc::clone(&source), self) {
+                log::error!("Couldn't spawn popup: {:?}", e);
+            };
 
             app::repeat_timeout3(rate, handle);
         });
