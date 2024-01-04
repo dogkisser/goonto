@@ -73,14 +73,16 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
         return Ok(())
     }
     
+    let (win_x, win_y) = window_position();
+    let mut wind = Window::new(win_x, win_y, 0, 0, "Goonto");
+    
     let mut image = SharedImage::load(image_path)?;
+    let (img_w, img_h) = reasonable_size(&image);
     let opacity = rand::thread_rng()
         .gen_range(cfg.opacity.from..=cfg.opacity.to) as f64 / 100.;
 
-    let (img_w, img_h) = reasonable_size(&image);
-    let (win_x, win_y) = window_position();
+    wind.set_size(img_w, img_h);
 
-    let mut wind = Window::new(win_x - (img_w / 2), win_y - (img_h / 2), img_w, img_h, "Goonto");
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
 
     image.scale(img_w, img_h, true, true);
@@ -90,8 +92,11 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
         if cfg.closable {
             /* SAFETY: I _know_ this widget has a window */
             w.window().unwrap().hide();
-            let mut c = COUNT.get().unwrap().lock().unwrap();
-            *c = c.saturating_sub(1);
+            
+            {
+                let mut c = COUNT.get().unwrap().lock().unwrap();
+                *c = c.saturating_sub(1);
+            }
 
             if rand::thread_rng().gen_range(0..100) < cfg.mitosis.chance {
                 for _ in 0..rand::thread_rng().gen_range(0..cfg.mitosis.max) {
