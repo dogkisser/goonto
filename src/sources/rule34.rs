@@ -85,7 +85,7 @@ fn stocktake(
         }
 
         let url = format!("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=10&tags=sort:random -animated {} {}",
-            prefix, crate::sources::random_from(&tags));
+            prefix, crate::sources::random_from(tags));
 
         let client = reqwest::Client::new();
 
@@ -131,7 +131,7 @@ fn stocktake(
             })
             .for_each_concurrent(10, |res| async move {
                 let res = res.await;
-                if let Err(_) = res {
+                if res.is_err() {
                     log::warn!("Failed to download image: {:?}", res);
                 };
             })

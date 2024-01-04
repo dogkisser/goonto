@@ -130,7 +130,7 @@ fn stocktake(tags: &[String], images: &Arc<Mutex<Vec<String>>>, full_res: bool, 
             })
             .for_each_concurrent(10, |res| async move {
                 let res = res.await;
-                if let Err(_) = res {
+                if res.is_err() {
                     log::warn!("Failed to download image: {:?}.", res);
                 };
             })

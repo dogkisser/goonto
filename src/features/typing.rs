@@ -34,6 +34,8 @@ impl Typing {
 }
 
 fn block_input(should: bool) {
+    _ = should;
+    
     #[cfg(target_os = "windows")] unsafe {
         use windows::Win32::UI::Input::KeyboardAndMouse::BlockInput;
         

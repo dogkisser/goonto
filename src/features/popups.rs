@@ -157,7 +157,7 @@ fn make_window_topmost(handle: fltk::window::RawHandle) {
                 type_: ClientMessage,
                 serial: 0,
                 send_event: 1,
-                display: display,
+                display,
                 window: handle,
                 message_type: XInternAtom(display, wm_state.as_ptr(), 0),
                 format: 32,

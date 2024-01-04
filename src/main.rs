@@ -148,7 +148,7 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
             std::fs::copy(me,  bin_out)?;
             std::fs::copy(cfg, cfg_out)?;
             
-            std::fs::write(home.join(".config/autostart/Goonto.desktop"), &desktop)?;
+            std::fs::write(home.join(".config/autostart/Goonto.desktop"), desktop)?;
         } else {
             let _ = std::fs::remove_file(home.join(".config/autostart/Goonto.desktop"));
         }
