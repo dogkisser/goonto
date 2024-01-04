@@ -75,7 +75,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     
     let mut image = SharedImage::load(image_path)?;
     let opacity = rand::thread_rng()
-        .gen_range(cfg.opacity.from..cfg.opacity.to) as f64 / 100.;
+        .gen_range(cfg.opacity.from..=cfg.opacity.to) as f64 / 100.;
 
     let (img_w, img_h) = reasonable_size(&image);
     let (win_x, win_y) = window_position();

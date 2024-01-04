@@ -3,5 +3,6 @@
 /goonto-cache
 /goonto.log
 /.vscode
+/.direnv
 # Don't ask why this is here
 System Volume Information/
