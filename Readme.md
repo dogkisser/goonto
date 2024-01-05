@@ -1,52 +1,27 @@
 # Goonto
 
-## Why?
+If you have questions, please read the [FAQ](https://github.com/zoomasochist/goonto/wiki/FAQ/).
 
-Goonto is very similar to Edgeware, but:
+## Building
 
-- works on Linux and macOS
-- is simpler to configure
-- doesn't need packs
-- is a single compiled binary with no dependencies (i.e. Python)
+Debug builds (`cargo build`) differ slightly from release builds (`cargo build --release`). Notably, you can run Goonto without elevated permissions. This may break some features.
 
-## Feature Matrix
+### macOS / Windows
 
-| **Feature**         | **Competitors**† | **Goonto** |
-| ------------------- | ------------ | ---------- |
-| Linux/macOS support |      ❌      |     ✅     |
-| Ezpz to install     |      ❌      |     ✅     |
-| Blazing fast 🚀🚀🚀 |      ❌      |     ✅     |
-| Notification spam   |      ❌      |     ✅     |
-| Clipboard replace   |      ❌      |     ✅     |
-| Auto-type           |      ❌      |     ✅     |
-| Arbitrary folder for source | ❌    |     ✅     |
-| Panic button        |      ✅      |     ✅     |
-| Website opening     |      ✅      |     ✅     |
-| Popups              |      ✅      |     ✅     |
-| Popup opacity       |      ✅      |     ✅     |
-| Popup mitosis       |      ✅      |     ✅     |
-| Lowkey mode         |      ✅      |     ✅     |
-| Drive filler        |      ✅      |     ✅     |
-| Discord activity    |      ✅      |     ✅     |
-| Wallpaper changer   |      ✅      |     ✅     |
-| Popup censoring     |      ✅      |     ❌     |
-| Video popups        |      ✅      |     ❌     |
-| GUI configuration   |      ✅      |     ❌     |
-| Audio               |      ✅      |     ❌     |
-| Prompts             |      ✅      |     ❌     |
-| "Hibernate" mode    |      ✅      |     ❌     |
-| Walltaker support   |      ❌      |     ❌     |
-| Text-to-speech      |      ❌      |     ❌     |
+```
+$ cargo build --release
+$ target/release/goonto
+```
 
-†: It's Edgeware.
+### Linux
 
-## Platform Feature Parity
+Goonto has a few additional dependencies on Linux. They're listed in the [Release build workflow](https://github.com/zoomasochist/goonto/blob/master/.github/workflows/release.yml#L32).
 
-All features, except the ones listed below, work on all platforms.
+It's just standard X11 libs, `pkg-config`, and `cmake`. You probably have them installed already.
 
-| **Feature**                  | **Windows** | **Linux** | **macOS** |
-| ---------------------------- | ----------- | --------- | --------- |
-| Input blocking during typing |     ✅      |    ❌    |    ❌     |
-| Wallpaper changer            |     ✅      |    ❌    |    ❌     |
-| Click-through windows        |     ✅      |    ✅    |    ❌     |
-| Run on boot                  |     ✅      |    ✅    |    ❌     |
+Then:
+
+```
+$ cargo build --release
+$ target/release/goonto
+```
