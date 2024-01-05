@@ -238,7 +238,7 @@ fn window_position() -> (i32, i32) {
 }
 
 fn reasonable_size(image: &SharedImage) -> (i32, i32) {
-    let (x, y, w, h) = display_size();
+    let (_, _, w, h) = display_size();
     let img_w = image.w();
     let img_h = image.h();
 
