@@ -15,7 +15,7 @@ rand = "0.8.5"
 directories = "5.0.1"
 notify-rust = "4"
 enigo = "0.1.3"
-fltk = { version = "1.4.16", features = ["no-pango"] }
+fltk = { version = "1.4.21", features = ["no-pango"] }
 # I don't THINK FLTK has a way to do this
 global-hotkey = "0.4.0"
 single-instance = "0.3.3"

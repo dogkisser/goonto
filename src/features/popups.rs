@@ -6,6 +6,7 @@ use rand::Rng;
 use defaults::Defaults;
 
 // Not a great implementation but it's really easy and safe
+// Update: Deadlocks fixed so far: 1
 static COUNT: OnceLock<Mutex<u64>> = OnceLock::new();
 
 #[derive(Deserialize, Copy, Clone, Defaults)]
@@ -73,16 +74,14 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
         return Ok(())
     }
     
-    let (win_x, win_y) = window_position();
-    let mut wind = Window::new(win_x, win_y, 0, 0, "Goonto");
     
     let mut image = SharedImage::load(image_path)?;
-    let (img_w, img_h) = reasonable_size(&image);
     let opacity = rand::thread_rng()
         .gen_range(cfg.opacity.from..=cfg.opacity.to) as f64 / 100.;
 
-    wind.set_size(img_w, img_h);
-
+    let (img_w, img_h) = reasonable_size(&image);
+    let (win_x, win_y) = window_position();
+    let mut wind = Window::new(win_x - (img_w / 2), win_y - (img_h / 2), img_w, img_h, "Goonto");
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
 
     image.scale(img_w, img_h, true, true);
@@ -93,6 +92,12 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
             /* SAFETY: I _know_ this widget has a window */
             w.window().unwrap().hide();
             
+            // unsafe {
+            //     let image = w.image_mut().unwrap();
+            //     <fltk::image::Image as fltk::prelude::ImageExt>::delete(*image);
+                // image.delete();
+            // }
+
             {
                 let mut c = COUNT.get().unwrap().lock().unwrap();
                 *c = c.saturating_sub(1);
@@ -108,6 +113,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
 
     *COUNT.get().unwrap().lock().unwrap() += 1;
 
+    // wind.set_screen_num(display);
     wind.set_border(false);
     wind.set_callback(|_| { });
     wind.end();
@@ -216,35 +222,29 @@ fn make_window_clickthrough(handle: fltk::window::RawHandle) {
     }
 }
 
-// FLTK uses 0 as the top left of the primary monitor, with monitors to the left having negative
-// coordinates. So this returns ((min_x, max_x), max_y)
-fn display_size() -> ((i32, i32), i32) {
-    let mut geometries = Vec::new();
-    for i in 0..app::screen_count() {
-        geometries.push(app::screen_xywh(i));
-    }
+// (x, y, w, h)
+fn display_size() -> (i32, i32, i32, i32) {
+    let display = rand::thread_rng().gen_range(0..app::screen_count());
+    let (x, y, w, h) = app::screen_xywh(display);
 
-    let min_x = geometries.iter().map(|m| m.0).min().unwrap();
-    let max_x = geometries.iter().map(|m| m.2).max().unwrap();
-    let y = geometries.iter().map(|m| m.3).max().unwrap();
-
-    ((min_x, max_x), y)
+    (x, y, w, h)
 }
 
 fn window_position() -> (i32, i32) {
-    let ((min_x, max_x), max_y) = display_size();
+    let (x, y, w, h) = display_size();
 
-    (rand::thread_rng().gen_range(min_x..max_x), rand::thread_rng().gen_range(0..max_y))
+    (rand::thread_rng().gen_range(x..x+w),
+     rand::thread_rng().gen_range(y..y+h))
 }
 
 fn reasonable_size(image: &SharedImage) -> (i32, i32) {
-    let ((_, max_x), mon_h) = display_size();
+    let (x, y, w, h) = display_size();
     let img_w = image.w();
     let img_h = image.h();
 
     let ratio = f32::min(
-        max_x as f32 / img_w as f32,
-        mon_h as f32 / img_h as f32) / 3.;
+        w as f32 / img_w as f32,
+        h as f32 / img_h as f32) / 3.;
 
     ((img_w as f32 * ratio) as i32,
      (img_h as f32 * ratio) as i32)

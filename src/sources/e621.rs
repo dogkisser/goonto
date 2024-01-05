@@ -76,7 +76,6 @@ impl sources::Source for E621 {
     
 }
 
-/* TODO: hacky in general */
 fn stocktake(tags: &[String], images: &Arc<Mutex<Vec<String>>>, full_res: bool, prefix: &str)
     -> anyhow::Result<()>
 {
