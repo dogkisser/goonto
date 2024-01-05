@@ -42,7 +42,7 @@ jobs:
         run: |
           rustup target add aarch64-apple-darwin
           rustup target add x86_64-apple-darwin
-          cargo install universal2
+          cargo install universal2 --version 0.0.1
           cargo universal2
           mkdir -p target/release
           mv target/universal2-apple-darwin/release/goonto target/release/goonto-macos-fat
