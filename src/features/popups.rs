@@ -206,6 +206,13 @@ fn make_window_clickthrough(handle: fltk::window::RawHandle) {
         );
     }
 
+    #[cfg(target_os = "macos")] unsafe {
+        use objc2::{*, runtime::*};
+
+        let wind: &AnyObject = std::mem::transmute::<_, _>(handle);
+        let _: () = msg_send![wind, setIgnoresMouseEvents: true];
+    }
+
     #[cfg(target_os = "linux")] unsafe {
         use x11::{
             xlib::{XRectangle, XOpenDisplay, XCloseDisplay},
