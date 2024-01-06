@@ -189,36 +189,7 @@ fn make_window_topmost(handle: fltk::window::RawHandle) {
     }
 
     #[cfg(target_os = "linux")] unsafe {
-        let display = XOpenDisplay(&0);
-
-        let wm_state = CString::new(b"_NET_WM_STATE".to_vec()).unwrap();
-        let wm_abv = CString::new(b"_NET_WM_STATE_ABOVE".to_vec()).unwrap();
-
-        let mut event = XEvent {
-            client_message: XClientMessageEvent {
-                type_: ClientMessage,
-                serial: 0,
-                send_event: 1,
-                display,
-                window: handle,
-                message_type: XInternAtom(display, wm_state.as_ptr(), 0),
-                format: 32,
-                data: ClientMessageData::from([
-                    1,
-                    XInternAtom(display, wm_abv.as_ptr(), 0),
-                    0, 0, 0,
-                ]),
-            }
-        };
-
-        XSendEvent(
-            display,
-            XDefaultRootWindow(display),
-            0,
-            SubstructureRedirectMask|SubstructureNotifyMask, &mut event);
-        
-        XFlush(display);
-        XCloseDisplay(display);
+        send_message("_NET_WM_STATE", "_NET_WM_STATE_ABOVE", handle);
     }
 }
 
@@ -232,38 +203,43 @@ fn make_window_bottommost(handle: fltk::window::RawHandle) -> anyhow::Result<()>
     }
 
     #[cfg(target_os = "linux")] unsafe {
-        let display = XOpenDisplay(&0);
-        let wm_state = CString::new(b"_NET_WM_STATE".to_vec()).unwrap();
-        let wm_below = CString::new(b"_NET_WM_STATE_BELOW".to_vec()).unwrap();
-
-        let mut event = XEvent {
-            client_message: XClientMessageEvent {
-                type_: ClientMessage,
-                serial: 0,
-                send_event: 1,
-                display,
-                window: handle,
-                message_type: XInternAtom(display, wm_state.as_ptr(), 0),
-                format: 32,
-                data: ClientMessageData::from([
-                    1,
-                    XInternAtom(display, wm_below.as_ptr(), 0),
-                    0, 0, 0,
-                ]),
-            }
-        };
-
-        XSendEvent(
-            display,
-            XDefaultRootWindow(display),
-            0,
-            SubstructureRedirectMask|SubstructureNotifyMask, &mut event);
-        
-        XFlush(display);
-        XCloseDisplay(display);
+        send_message("_NET_WM_STATE", "_NET_WM_STATE_BELOW", handle);
     }
 
     Ok(())
+}
+
+#[cfg(target_os = "linux")]
+unsafe fn send_message(message_type: &str, message: &str, handle: fltk::window::RawHandle) {
+    let display = XOpenDisplay(&0);
+    let message_type = CString::new(message_type).unwrap();
+    let message = CString::new(message).unwrap();
+
+    let mut event = XEvent {
+        client_message: XClientMessageEvent {
+            type_: ClientMessage,
+            serial: 0,
+            send_event: 1,
+            display,
+            window: handle,
+            message_type: XInternAtom(display, message_type.as_ptr(), 0),
+            format: 32,
+            data: ClientMessageData::from([
+                1,
+                XInternAtom(display, message.as_ptr(), 0),
+                0, 0, 0,
+            ]),
+        }
+    };
+
+    XSendEvent(
+        display,
+        XDefaultRootWindow(display),
+        0,
+        SubstructureRedirectMask|SubstructureNotifyMask, &mut event);
+    
+    XFlush(display);
+    XCloseDisplay(display);
 }
 
 fn make_window_clickthrough(handle: fltk::window::RawHandle) {
