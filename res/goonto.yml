@@ -63,6 +63,9 @@ effects:
     # Whether clicking on a popup clicks the popup or the window underneath it.
     # "true" effectively disables closeable.
     click-through: false
+    # This controls whether popups are always kept on top of your other windows
+    # (using "above"), or always kept below them (using "below").
+    x-position: above
     # Here you can specify which monitors you want popups to display on.
     # Your options are either "all" or "except-primary", which are both pretty
     # self explanatory, _or_ an array of numbers specifying specific monitors.

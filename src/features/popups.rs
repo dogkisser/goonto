@@ -202,11 +202,6 @@ fn make_window_bottommost(handle: fltk::window::RawHandle) -> anyhow::Result<()>
             SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE)?;
     }
 
-    #[cfg(target_os = "macos")] unsafe {
-        let wind: &AnyObject = std::mem::transmute::<_, _>(handle);
-        let _: () = msg_send![wind, setLevel: (17 as isize)];
-    }
-
     #[cfg(target_os = "linux")] unsafe {
         send_message("_NET_WM_STATE", "_NET_WM_STATE_BELOW", handle);
     }
