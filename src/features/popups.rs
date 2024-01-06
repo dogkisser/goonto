@@ -20,6 +20,7 @@ pub struct Popups {
     #[def = "true"]
     closable: bool,
     closes_after: u64,
+    x_position: XPosision,
     monitors: Monitors,
     max: u64,
     click_through: bool,
@@ -27,7 +28,15 @@ pub struct Popups {
     mitosis: Mitosis,
 }
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum XPosision {
+    #[default]
+    Above,
+    Below,
+}
+
+#[derive(Deserialize, Default)]
 #[serde(rename_all = "kebab-case")]
 pub enum Monitors {
     #[default]
@@ -130,7 +139,10 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     wind.show();
     wind.set_opacity(opacity);
 
-    make_window_topmost(wind.raw_handle());
+    match cfg.x_position {
+        XPosision::Above => make_window_topmost(wind.raw_handle()),
+        XPosision::Below => make_window_bottommost(wind.raw_handle()),
+    }
 
     if cfg.click_through {
         make_window_clickthrough(wind.raw_handle());
@@ -202,6 +214,43 @@ fn make_window_topmost(handle: fltk::window::RawHandle) {
     }
 }
 
+fn make_window_bottommost(handle: fltk::window::RawHandle) {
+    #[cfg(target_os = "linux")] unsafe {
+        use x11::xlib::*;
+        use std::ffi::CString;
+        
+        let display = XOpenDisplay(&0);
+        let wm_state = CString::new(b"_NET_WM_STATE".to_vec()).unwrap();
+        let wm_below = CString::new(b"_NET_WM_STATE_BELOW".to_vec()).unwrap();
+
+        let mut event = XEvent {
+            client_message: XClientMessageEvent {
+                type_: ClientMessage,
+                serial: 0,
+                send_event: 1,
+                display,
+                window: handle,
+                message_type: XInternAtom(display, wm_state.as_ptr(), 0),
+                format: 32,
+                data: ClientMessageData::from([
+                    1,
+                    XInternAtom(display, wm_below.as_ptr(), 0),
+                    0, 0, 0,
+                ]),
+            }
+        };
+
+        XSendEvent(
+            display,
+            XDefaultRootWindow(display),
+            0,
+            SubstructureRedirectMask|SubstructureNotifyMask, &mut event);
+        
+        XFlush(display);
+        XCloseDisplay(display);
+    }
+}
+
 fn make_window_clickthrough(handle: fltk::window::RawHandle) {
     #[cfg(target_os = "windows")] unsafe {
         use windows::Win32::Foundation::HWND;
@@ -256,8 +305,6 @@ fn random_monitor(rules: &Monitors) -> (i32, i32, i32, i32) {
             *xs.choose(&mut rand::thread_rng()).unwrap()
         },
     };
-
-    log::info!("chose display {display} (mode {rules:?})");
 
     app::screen_xywh(display)
 }
