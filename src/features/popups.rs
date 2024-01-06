@@ -1,6 +1,7 @@
 use std::rc::Rc;
-use std::sync::{Mutex, OnceLock};
+use std::sync::{Mutex, OnceLock, Arc};
 use fltk::{prelude::*, app, window::Window, button::Button, image::SharedImage};
+use rand::seq::SliceRandom;
 use serde::Deserialize;
 use rand::Rng;
 use defaults::Defaults;
@@ -9,7 +10,7 @@ use defaults::Defaults;
 // Update: Deadlocks fixed so far: 1
 static COUNT: OnceLock<Mutex<u64>> = OnceLock::new();
 
-#[derive(Deserialize, Copy, Clone, Defaults)]
+#[derive(Deserialize, Defaults)]
 #[serde(default, rename_all = "kebab-case")]
 pub struct Popups {
     #[def = "true"]
@@ -19,13 +20,24 @@ pub struct Popups {
     #[def = "true"]
     closable: bool,
     closes_after: u64,
+    monitors: Monitors,
     max: u64,
     click_through: bool,
     opacity: Opacity,
     mitosis: Mitosis,
 }
 
-#[derive(Deserialize, Copy, Clone, Defaults)]
+#[derive(Deserialize, Debug, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum Monitors {
+    #[default]
+    All,
+    ExceptPrimary,
+    #[serde(untagged)]
+    These(Vec<i32>),
+}
+
+#[derive(Deserialize, Clone, Defaults)]
 #[serde(default)]
 pub struct Mitosis {
     #[def = "30"]
@@ -34,7 +46,7 @@ pub struct Mitosis {
     max: u64,
 }
 
-#[derive(Deserialize, Copy, Clone, Defaults)]
+#[derive(Deserialize, Clone, Defaults)]
 #[serde(default)]
 pub struct Opacity {
     #[def = "70"]
@@ -47,9 +59,11 @@ impl Popups {
     pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {
         let _ = COUNT.get_or_init(|| Mutex::new(0));
         let rate = self.rate as f64 / 1000.;
+        let popups = Arc::new(self);
 
         app::add_timeout3(rate, move |handle| {
-            if let Err(e) = new_popup(Rc::clone(&source), self) {
+            let popups = Arc::clone(&popups);
+            if let Err(e) = new_popup(Rc::clone(&source), popups) {
                 log::error!("Couldn't spawn popup: {:?}", e);
             };
 
@@ -61,7 +75,7 @@ impl Popups {
 /* Returns the number of new popups to create immediately */
 fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     source: Rc<T>,
-    cfg: Popups
+    cfg: Arc<Popups>,
 ) -> anyhow::Result<()>
 {
     if cfg.max != 0 && *COUNT.get().unwrap().lock().unwrap() >= cfg.max {
@@ -79,16 +93,18 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     let opacity = rand::thread_rng()
         .gen_range(cfg.opacity.from..=cfg.opacity.to) as f64 / 100.;
 
-    let (img_w, img_h) = reasonable_size(&image);
-    let (win_x, win_y) = window_position();
+    let monitor = random_monitor(&cfg.monitors);
+    let (img_w, img_h) = reasonable_size(&image, &monitor);
+    let (win_x, win_y) = window_position(&monitor);
     let mut wind = Window::new(win_x - (img_w / 2), win_y - (img_h / 2), img_w, img_h, "Goonto");
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
 
     image.scale(img_w, img_h, true, true);
     button.set_image(Some(image));
 
+    let cfg_ = Arc::clone(&cfg);
     button.set_callback(move |w| {
-        if cfg.closable {
+        if cfg_.closable {
             /* SAFETY: I _know_ this widget has a window */
             w.window().unwrap().hide();
             w.set_image(None::<SharedImage>);
@@ -98,9 +114,9 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
                 *c = c.saturating_sub(1);
             }
 
-            if rand::thread_rng().gen_range(0..100) < cfg.mitosis.chance {
-                for _ in 0..rand::thread_rng().gen_range(0..cfg.mitosis.max) {
-                    let _ = new_popup(Rc::clone(&source), cfg);
+            if rand::thread_rng().gen_range(0..100) < cfg_.mitosis.chance {
+                for _ in 0..rand::thread_rng().gen_range(0..cfg_.mitosis.max) {
+                    let _ = new_popup(Rc::clone(&source), Arc::clone(&cfg_));
                 }
             }
         }
@@ -108,7 +124,6 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
 
     *COUNT.get().unwrap().lock().unwrap() += 1;
 
-    // wind.set_screen_num(display);
     wind.set_border(false);
     wind.set_callback(|_| { });
     wind.end();
@@ -226,28 +241,43 @@ fn make_window_clickthrough(handle: fltk::window::RawHandle) {
 }
 
 // (x, y, w, h)
-fn display_size() -> (i32, i32, i32, i32) {
-    let display = rand::thread_rng().gen_range(0..app::screen_count());
-    let (x, y, w, h) = app::screen_xywh(display);
+fn random_monitor(rules: &Monitors) -> (i32, i32, i32, i32) {
+    let screen_count = app::screen_count();
+    let display = match (rules, screen_count) {
+        (_, 1) => 0,
 
-    (x, y, w, h)
+        (Monitors::All, x) =>
+            rand::thread_rng().gen_range(0..x),
+
+        (Monitors::ExceptPrimary, x) => 
+            rand::thread_rng().gen_range(1..x),
+
+        (Monitors::These(xs), _) => {
+            *xs.choose(&mut rand::thread_rng()).unwrap()
+        },
+    };
+
+    log::info!("chose display {display} (mode {rules:?})");
+
+    app::screen_xywh(display)
 }
 
-fn window_position() -> (i32, i32) {
-    let (x, y, w, h) = display_size();
-
-    (rand::thread_rng().gen_range(x..x+w),
-     rand::thread_rng().gen_range(y..y+h))
+fn window_position((x, y, w, h): &(i32, i32, i32, i32)) -> (i32, i32) {
+    (rand::thread_rng().gen_range(*x..*x+*w),
+     rand::thread_rng().gen_range(*y..*y+*h))
 }
 
-fn reasonable_size(image: &SharedImage) -> (i32, i32) {
-    let (_, _, w, h) = display_size();
+fn reasonable_size(
+    image: &SharedImage,
+    (_, _, w, h): &(i32, i32, i32, i32)
+) -> (i32, i32)
+{
     let img_w = image.w();
     let img_h = image.h();
 
     let ratio = f32::min(
-        w as f32 / img_w as f32,
-        h as f32 / img_h as f32) / 3.;
+        *w as f32 / img_w as f32,
+        *h as f32 / img_h as f32) / 3.;
 
     ((img_w as f32 * ratio) as i32,
      (img_h as f32 * ratio) as i32)
