@@ -121,6 +121,7 @@ fn app() -> anyhow::Result<()> {
             && Instant::now().duration_since(started_at) > min_run_time
         {
             cfg.effects.wallpaper.exit_hook();
+            
             std::process::exit(0);
         }
     }

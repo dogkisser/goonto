@@ -83,6 +83,10 @@ impl Wallpaper {
     }
 
     pub fn exit_hook(&self) {
+        if self.enabled {
+            return
+        }
+        
         info!("[Wallpaper] resetting wallpaper on exit: {:?}",
             set_wallpaper(&self.old_wallpaper));
         
