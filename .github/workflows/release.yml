@@ -20,7 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: dtolnay/rust-toolchain@nightly-2024-01-05
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2024-01-04
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "goonto-build-cache"
