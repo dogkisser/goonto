@@ -63,6 +63,16 @@ effects:
     # Whether clicking on a popup clicks the popup or the window underneath it.
     # "true" effectively disables closeable.
     click-through: false
+    # Here you can specify which monitors you want popups to display on.
+    # Your options are either "all" or "except-primary", which are both pretty
+    # self explanatory, _or_ an array of numbers specifying specific monitors.
+    # The mapping of numbers to monitors is unspecified, except 0 being the main
+    # one, so I'd advise against depending on it. But it's there if you're so
+    # inclined.
+    # If only one monitor is connected, this setting is ignored.
+    monitors: all
+    # To use just your third monitor:
+    # monitors: [2]
     # Spawns more popups after closing one
     mitosis:
       # Make this 0 to effectively disable mitosis
