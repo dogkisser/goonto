@@ -80,7 +80,11 @@ fn allowed_extension(entry: &DirEntry) -> bool {
     entry
         .path()
         .extension()
-        .is_some_and(|e| allowed.contains(&e.to_string_lossy().to_string().as_str()))
+        .is_some_and(|e| allowed.contains(&e
+                .to_string_lossy()
+                .to_string()
+                .to_lowercase()
+                .as_str()))
 }
 
 fn is_file(entry: &DirEntry) -> anyhow::Result<bool> {
