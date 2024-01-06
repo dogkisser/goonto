@@ -91,13 +91,8 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
         if cfg.closable {
             /* SAFETY: I _know_ this widget has a window */
             w.window().unwrap().hide();
-            
-            // unsafe {
-            //     let image = w.image_mut().unwrap();
-            //     <fltk::image::Image as fltk::prelude::ImageExt>::delete(*image);
-                // image.delete();
-            // }
-
+            w.set_image(None::<SharedImage>);
+    
             {
                 let mut c = COUNT.get().unwrap().lock().unwrap();
                 *c = c.saturating_sub(1);
@@ -129,6 +124,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     if cfg.closes_after > 0 {
         app::add_timeout3(cfg.closes_after as f64 / 1000., move |_handle| {
             wind.hide();
+            button.set_image(None::<SharedImage>);
             let mut c = COUNT.get().unwrap().lock().unwrap();
             *c = c.saturating_sub(1);
         });
