@@ -5,6 +5,24 @@ use rand::seq::SliceRandom;
 use serde::Deserialize;
 use rand::Rng;
 use defaults::Defaults;
+#[cfg(target_os = "windows")]
+use windows::Win32::{
+    Foundation::HWND,
+    UI::WindowsAndMessaging::{
+        SetWindowPos, GetWindowLongA, SetWindowLongA,
+        HWND_BOTTOM, HWND_TOPMOST, SWP_NOSIZE, SWP_NOMOVE, SWP_NOACTIVATE,
+        GWL_EXSTYLE, WS_EX_TRANSPARENT, WS_EX_LAYERED,
+    },
+};
+#[cfg(target_os = "macos")]
+use objc2::{*, runtime::*};
+#[cfg(target_os = "linux")]
+use x11::{
+    xlib::*,
+    xfixes::{XFixesSetWindowShapeRegion, XFixesDestroyRegion, XFixesCreateRegion},
+};
+#[cfg(target_os = "linux")]
+use std::ffi::CString;
 
 // Not a great implementation but it's really easy and safe
 // Update: Deadlocks fixed so far: 1
@@ -141,7 +159,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
 
     match cfg.x_position {
         XPosision::Above => make_window_topmost(wind.raw_handle()),
-        XPosision::Below => make_window_bottommost(wind.raw_handle()),
+        XPosision::Below => make_window_bottommost(wind.raw_handle())?,
     }
 
     if cfg.click_through {
@@ -162,25 +180,15 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
 
 fn make_window_topmost(handle: fltk::window::RawHandle) {
     #[cfg(target_os = "windows")] unsafe {
-        use windows::Win32::Foundation::HWND;
-        use windows::Win32::UI::WindowsAndMessaging::{
-            SetWindowPos, HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE,
-        };
-
         let _ = SetWindowPos(HWND(handle as _), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
     }
 
     #[cfg(target_os = "macos")] unsafe {
-        use objc2::{*, runtime::*};
-
         let wind: &AnyObject = std::mem::transmute::<_, _>(handle);
         let _: () = msg_send![wind, setLevel: (1 as isize)];
     }
 
     #[cfg(target_os = "linux")] unsafe {
-        use x11::xlib::*;
-        use std::ffi::CString;
-
         let display = XOpenDisplay(&0);
 
         let wm_state = CString::new(b"_NET_WM_STATE".to_vec()).unwrap();
@@ -214,11 +222,16 @@ fn make_window_topmost(handle: fltk::window::RawHandle) {
     }
 }
 
-fn make_window_bottommost(handle: fltk::window::RawHandle) {
+fn make_window_bottommost(handle: fltk::window::RawHandle) -> anyhow::Result<()> {
+    #[cfg(target_os = "windows")] unsafe {
+        SetWindowPos(
+            HWND(handle as _),
+            HWND_BOTTOM,
+            0, 0, 0, 0,
+            SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE)?;
+    }
+
     #[cfg(target_os = "linux")] unsafe {
-        use x11::xlib::*;
-        use std::ffi::CString;
-        
         let display = XOpenDisplay(&0);
         let wm_state = CString::new(b"_NET_WM_STATE".to_vec()).unwrap();
         let wm_below = CString::new(b"_NET_WM_STATE_BELOW".to_vec()).unwrap();
@@ -249,16 +262,12 @@ fn make_window_bottommost(handle: fltk::window::RawHandle) {
         XFlush(display);
         XCloseDisplay(display);
     }
+
+    Ok(())
 }
 
 fn make_window_clickthrough(handle: fltk::window::RawHandle) {
     #[cfg(target_os = "windows")] unsafe {
-        use windows::Win32::Foundation::HWND;
-        use windows::Win32::UI::WindowsAndMessaging::{
-            GWL_EXSTYLE, WS_EX_TRANSPARENT, WS_EX_LAYERED,
-            GetWindowLongA, SetWindowLongA
-        };
-
         let current_style = GetWindowLongA(HWND(handle as _), GWL_EXSTYLE) as u32;
         let _ = SetWindowLongA(HWND(handle as _),
             GWL_EXSTYLE,
@@ -267,18 +276,11 @@ fn make_window_clickthrough(handle: fltk::window::RawHandle) {
     }
 
     #[cfg(target_os = "macos")] unsafe {
-        use objc2::{*, runtime::*};
-
         let wind: &AnyObject = std::mem::transmute::<_, _>(handle);
         let _: () = msg_send![wind, setIgnoresMouseEvents: true];
     }
 
     #[cfg(target_os = "linux")] unsafe {
-        use x11::{
-            xlib::{XRectangle, XOpenDisplay, XCloseDisplay},
-            xfixes::{XFixesSetWindowShapeRegion, XFixesDestroyRegion, XFixesCreateRegion},
-        };
-
         let display = XOpenDisplay(std::ptr::null());
         let mut rectangle = XRectangle { x: 0, y: 0, width: 0, height: 0, };
         let region = XFixesCreateRegion(display, &mut rectangle, 1);

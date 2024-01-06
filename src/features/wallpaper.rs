@@ -3,7 +3,8 @@ use serde::Deserialize;
 use fltk::app;
 use defaults::Defaults;
 use log::info;
-
+#[cfg(target_os = "windows")]
+use std::path::PathBuf;
 #[cfg(target_os = "windows")]
 use windows::{
     core::{HSTRING, PCWSTR},
@@ -59,8 +60,6 @@ impl Wallpaper {
     
     fn store_old_wallpaper(&mut self) -> anyhow::Result<()> {
         #[cfg(target_os = "windows")] unsafe {
-            use std::path::PathBuf;
-    
             CoInitializeEx(None, COINIT_MULTITHREADED)?;
             let idw: IDesktopWallpaper = CoCreateInstance(&DesktopWallpaper, None, CLSCTX_ALL)?;
             let first_monitor = idw.GetMonitorDevicePathAt(0)?;

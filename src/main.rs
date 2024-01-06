@@ -7,6 +7,28 @@ use std::path::Path;
 use fltk::app;
 use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey, Modifiers, Code}};
 use log::{LevelFilter, error, info};
+#[cfg(target_os = "windows")]
+use windows::{
+    core::{PWSTR, BSTR},
+    Win32::{
+        Security::PSECURITY_DESCRIPTOR,
+        System::{
+            Variant::VariantInit,
+            WindowsProgramming::GetUserNameW,
+            TaskScheduler::{
+                TASK_CREATE_OR_UPDATE, TASK_LOGON_GROUP,
+                TaskScheduler,
+                ITaskService,
+            },
+            Com::{
+                COINIT_MULTITHREADED, RPC_C_AUTHN_LEVEL_PKT_PRIVACY,
+                RPC_C_IMP_LEVEL_IMPERSONATE, EOLE_AUTHENTICATION_CAPABILITIES,
+                CLSCTX_ALL,
+                CoInitializeEx, CoInitializeSecurity, CoCreateInstance
+            }
+        }
+    }
+};
 
 mod config;
 mod sources;
@@ -156,27 +178,6 @@ fn set_run_on_boot(to: bool) -> anyhow::Result<()> {
     }
 
     #[cfg(target_os = "windows")] unsafe {
-        use windows::{
-            core::{PWSTR, BSTR},
-            Win32::{
-                Security::PSECURITY_DESCRIPTOR,
-                System::{
-                    Variant::VariantInit,
-                    WindowsProgramming::GetUserNameW,
-                    TaskScheduler::{
-                        TASK_CREATE_OR_UPDATE, TASK_LOGON_GROUP,
-                        TaskScheduler,
-                        ITaskService,
-                    },
-                    Com::{
-                        COINIT_MULTITHREADED, RPC_C_AUTHN_LEVEL_PKT_PRIVACY,
-                        RPC_C_IMP_LEVEL_IMPERSONATE, EOLE_AUTHENTICATION_CAPABILITIES, CLSCTX_ALL,
-                        CoInitializeEx, CoInitializeSecurity, CoCreateInstance
-                    }
-                }
-            }
-        };
-
         let drop_to = directories.config_dir().join("Goonto");
         let bin_out = drop_to.join("goonto.exe");
         let cfg_out = drop_to.join("goonto.yml");
