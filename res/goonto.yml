@@ -80,7 +80,7 @@ effects:
     # of your display, while "any" will allow popups to be any size between
     # fairly small to as large as your entire display. Alternatively, enter a
     # number that image sizes will be clamped to.
-    size: any
+    size: auto
     # Maximum number of popups that can be open at once
     # 0 == unlimited
     max: 0
