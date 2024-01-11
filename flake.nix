@@ -4,8 +4,12 @@
   outputs = { self, nixpkgs }:
   let pkgs = nixpkgs.legacyPackages.x86_64-linux;
       deps = with pkgs; with xorg;
-        [ xdotool libX11 libXcursor libXrandr libXinerama pango cairo libXft libXi
-        libGL rustup cmake ];
+        [
+          xdotool libX11 libXcursor libXrandr libXinerama pango cairo libXft
+          libXi libGL rustup cmake
+          # lldb debugging
+          zlib
+        ];
   in
     {
       devShells.x86_64-linux.default = pkgs.mkShell

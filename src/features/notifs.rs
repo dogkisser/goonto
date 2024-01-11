@@ -22,8 +22,6 @@ impl Notifs {
             let _ = notify_rust::Notification::new()
                 .summary("Goonto notification!")
                 .body(&source.third_person())
-                // This doesn't build on Windows?
-                // .hint(notify_rust::Hint::Resident(self.close_automatically))
                 .show();
             
             app::repeat_timeout3(rate, handle);

@@ -4,5 +4,6 @@
 /goonto.log
 /.vscode
 /.direnv
+/heaptrack.*
 # Don't ask why this is here
 System Volume Information/

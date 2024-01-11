@@ -136,7 +136,6 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     }
     
     let image_path = source.image();
-    
     if image_path.is_empty() {
         return Ok(())
     }
@@ -195,6 +194,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
         app::add_timeout3(cfg.closes_after as f64 / 1000., move |_handle| {
             wind.hide();
             button.set_image(None::<SharedImage>);
+            
             let mut c = COUNT.get().unwrap().lock().unwrap();
             *c = c.saturating_sub(1);
         });
