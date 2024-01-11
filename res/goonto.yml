@@ -91,8 +91,8 @@ effects:
     # (using "above"), or always kept below them (using "below").
     x-position: above
     # Here you can specify which monitors you want popups to display on.
-    # Your options are either "all" or "except-primary", which are both pretty
-    # self explanatory, _or_ an array of numbers specifying specific monitors.
+    # Your options are either "all", "primary", or "except-primary", which are
+    # pretty self explanatory, _or_ an array of numbers specifying specific monitors.
     # The mapping of numbers to monitors is unspecified, except 0 being the main
     # one, so I'd advise against depending on it. But it's there if you're so
     # inclined.

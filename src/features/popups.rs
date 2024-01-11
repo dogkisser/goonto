@@ -60,6 +60,7 @@ pub enum XPosision {
 pub enum Monitors {
     #[default]
     All,
+    Primary,
     ExceptPrimary,
     #[serde(untagged)]
     These(Vec<i32>),
@@ -125,7 +126,6 @@ impl Popups {
     }
 }
 
-/* Returns the number of new popups to create immediately */
 fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     source: Rc<T>,
     cfg: Arc<Popups>,
@@ -142,7 +142,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
 
     let monitor = random_monitor(&cfg.monitors);
     let (win_x, win_y) = window_position(&monitor);
-    let mut wind = Window::new(win_x, win_y, 0, 0, "Goonto");
+    let mut wind = Window::new(win_x, win_y, 0, 0, "Goonto Popup");
 
     let mut image = SharedImage::load(image_path)?;
     let opacity = rand::thread_rng()
@@ -303,6 +303,8 @@ fn random_monitor(rules: &Monitors) -> (i32, i32, i32, i32) {
 
         (Monitors::All, x) =>
             rand::thread_rng().gen_range(0..x),
+
+        (Monitors::Primary, _) => 0,
 
         (Monitors::ExceptPrimary, x) => 
             rand::thread_rng().gen_range(1..x),
