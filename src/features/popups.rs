@@ -44,6 +44,8 @@ pub struct Popups {
     click_through: bool,
     opacity: Opacity,
     mitosis: Mitosis,
+    size: Size,
+    movement: Movement,
 }
 
 #[derive(Deserialize, Default)]
@@ -82,6 +84,31 @@ pub struct Opacity {
     to: u16,
 }
 
+#[derive(Deserialize, Clone, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum Size {
+    #[default]
+    Auto,
+    Any,
+    #[serde(untagged)]
+    Arbitrary(usize),
+}
+
+#[derive(Deserialize, Clone, Defaults)]
+#[serde(default, rename_all = "kebab-case")]
+pub struct Movement {
+    chance: usize,
+    speed: MovementSpeed,
+}
+
+#[derive(Deserialize, Clone, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum MovementSpeed {
+    Fast,
+    #[default]
+    Slow,
+}
+
 impl Popups {
     pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {
         let _ = COUNT.get_or_init(|| Mutex::new(0));
@@ -115,15 +142,14 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
         return Ok(())
     }
     
-    
     let mut image = SharedImage::load(image_path)?;
     let opacity = rand::thread_rng()
         .gen_range(cfg.opacity.from..=cfg.opacity.to) as f64 / 100.;
 
     let monitor = random_monitor(&cfg.monitors);
-    let (img_w, img_h) = reasonable_size(&image, &monitor);
+    let (img_w, img_h) = reasonable_size(&image, &monitor, &cfg.size);
     let (win_x, win_y) = window_position(&monitor);
-    let mut wind = Window::new(win_x - (img_w / 2), win_y - (img_h / 2), img_w, img_h, "Goonto");
+    let mut wind = Window::new(win_x, win_y, img_w, img_h, "Goonto");
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
 
     image.scale(img_w, img_h, true, true);
@@ -294,16 +320,40 @@ fn window_position((x, y, w, h): &(i32, i32, i32, i32)) -> (i32, i32) {
 
 fn reasonable_size(
     image: &SharedImage,
-    (_, _, w, h): &(i32, i32, i32, i32)
+    (_, _, w, h): &(i32, i32, i32, i32),
+    config: &Size,
 ) -> (i32, i32)
 {
     let img_w = image.w();
     let img_h = image.h();
 
-    let ratio = f32::min(
+    // image resolution clamped to monitor resolution
+    let clamped = f32::min(
         *w as f32 / img_w as f32,
-        *h as f32 / img_h as f32) / 3.;
+        *h as f32 / img_h as f32);
 
-    ((img_w as f32 * ratio) as i32,
-     (img_h as f32 * ratio) as i32)
+    match config {
+        Size::Auto => {
+            let ratio = clamped / 3.;
+        
+            ((img_w as f32 * ratio) as i32,
+             (img_h as f32 * ratio) as i32)
+        },
+        Size::Any => {
+            let multiplier = rand::thread_rng().gen_range(1.0..=4.);
+            let ratio = clamped / multiplier;
+
+            ((img_w as f32 * ratio) as i32,
+             (img_h as f32 * ratio) as i32)
+        },
+        Size::Arbitrary(max) => {
+            let ratio = f32::min(
+                *max as f32 / img_w as f32,
+                *max as f32 / img_h as f32);
+            
+           ((img_w as f32 * ratio) as i32,
+             (img_h as f32 * ratio) as i32)
+        },
+    }
+
 }

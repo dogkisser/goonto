@@ -5,7 +5,7 @@ use defaults::Defaults;
 
 use crate::features::*;
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Defaults)]
 #[serde(default, rename_all = "kebab-case")]
 pub struct Config {
     pub run_on_boot: bool,
@@ -14,6 +14,8 @@ pub struct Config {
     pub image_source: ImageSource,
     pub effects: Effects,
     pub babble: Babble,
+    #[def = "String::from(\"Ctrl + Backspace\")"]
+    pub exit_keybind: String,
 }
 
 #[derive(Deserialize, Default)]

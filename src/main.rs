@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![warn(clippy::suspicious, clippy::complexity, clippy::style, clippy::perf)]
 #![feature(panic_update_hook)]
+use std::str::FromStr;
 use std::time::Duration;
 use std::{rc::Rc, time::Instant};
 use std::path::Path;
@@ -107,7 +108,8 @@ fn app() -> anyhow::Result<()> {
         };
 
     let manager = GlobalHotKeyManager::new()?;
-    let hotkey = HotKey::new(Some(Modifiers::CONTROL), Code::Backspace);
+    let hotkey = HotKey::from_str(&cfg.exit_keybind)?;
+    info!("Parsed exit hotkey as {hotkey:?}");
     manager.register(hotkey)?;
 
     let _app = app::App::default();

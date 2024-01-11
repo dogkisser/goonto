@@ -1,39 +1,58 @@
 # Example Goonto configuration.
 # Everything past the hash symbol (#) is a comment, and is ignored.
 
-# Everything except popups are off by default, with most other settings at sane defaults.
-# So feel free to have a minimal configuration that only changes what you want changed.
+# Everything except popups are off by default, with most other settings at sane
+# defaults.
+# So feel free to have a minimal configuration that only changes what you want
+# changed.
 
 # Whether Goonto should run automatically when your computer starts.
 run-on-boot: false
 
-# Whether to write logs to a goonto.log file. Useful if something is going wrong, but you
-# can generally leave this off.
+# Whether to write logs to a goonto.log file. Useful if something is going
+# wrong, but you can generally leave this off.
 save-logs: false
 
-# The minimum amount of time Goonto must run before it will obey the quit keybind
-# (in milliseconds).
+# The minimum amount of time Goonto must run before it will obey the quit
+# keybind (in milliseconds).
 minimum-run-time: 0
 
+# The keybind used to exit Goonto. It's composed of a single key and an optional
+# modifier.
+# Available modifiers are: Alt, Shift, Ctrl, Super ("Windows Key").
+# The latter key component can be any key on your keyboard. For a full list of
+# technical key identifiers, see:
+# https://w3c.github.io/uievents-code/#key-alphanumeric-writing-system.
+# Note that on Linux, X is generally not happy with you binding things to Super.
+exit-keybind: Ctrl + Backspace
+# Other examples:
+# exit-keybind: Alt + N
+# exit-keybind: Super + 9
+
 # This configures where Goonto will get its images from.
-# You can either use the internet ("web") or local images ("local"). If the "local" key is
-# a valid path, that is used, overriding web.
+# You can either use the internet ("web") or local images ("local"). If the
+# "local" key is a valid path, that is used, overriding web.
 image-source:
   web:
     # Whether to download "sample" or "full" resolution images. Samples may be
-    # significantly faster, particularly with high rates or slow connections, but you may
-    # want to use "full" in case you see images you like and want to save them.
+    # significantly faster, particularly with high rates or slow connections,
+    # but you may want to use "full" in case you see images you like and want
+    # to save them.
     # Samples are more than high-res enough to look good in popups.
     image-res: sample
-    # The booru to get images from. "e621.net", "realbooru.com", and "rule34.xxx" are
-    # supported.
+
+    # The booru to get images from. "e621.net", "realbooru.com", and
+    # "rule34.xxx" are supported.
     booru: e621.net
+
     # This is a collection of tags added to every query. The default is
-    # "score:>200 rating:explicit", which is generally fine in 99% of cases. But if you'd
-    # like to see SFW or low-score posts, you may want to change it.
-    # tag-prefix:
-    # Tags to use to query boorus. Each line (beginning with a hyphen) is an individual
-    # query, i.e., every tag on a given line will be used as part of the search.
+    # "score:>200 rating:explicit", which is generally fine in 99% of cases.
+    # But if you'd like to see SFW or low-score posts, you may want to change it.
+    tag-prefix: score:>200 rating:explicit
+
+    # Tags to use to query boorus. Each line (beginning with a hyphen) is an
+    # individual query, i.e., every tag on a given line will be used as part of
+    # the search.
     tags:
       - ~equine ~canine dominant_feral
       - sugarlesspaints zebra -comic
@@ -57,6 +76,11 @@ effects:
     # How many milliseconds until the popup closes itself.
     # 0 Turns this off.
     closes-after: 30000
+    # How big images will be. "auto" uses an algorithm based on the resolution
+    # of your display, while "any" will allow popups to be any size between
+    # fairly small to as large as your entire display. Alternatively, enter a
+    # number that image sizes will be clamped to.
+    size: any
     # Maximum number of popups that can be open at once
     # 0 == unlimited
     max: 0
@@ -76,7 +100,8 @@ effects:
     monitors: all
     # To use just your third monitor:
     # monitors: [2]
-    # Spawns more popups after closing one
+
+    # Mitosis causes more popups to spawn whenever one is closed.
     mitosis:
       # Make this 0 to effectively disable mitosis
       chance: 50
