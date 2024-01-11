@@ -26,6 +26,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "goonto-build-cache"
+          key: ""
 
       - name: install build deps
         run: >
