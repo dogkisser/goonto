@@ -139,15 +139,18 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     if image_path.is_empty() {
         return Ok(())
     }
-    
+
+    let monitor = random_monitor(&cfg.monitors);
+    let (win_x, win_y) = window_position(&monitor);
+    let mut wind = Window::new(win_x, win_y, 0, 0, "Goonto");
+
     let mut image = SharedImage::load(image_path)?;
     let opacity = rand::thread_rng()
         .gen_range(cfg.opacity.from..=cfg.opacity.to) as f64 / 100.;
-
-    let monitor = random_monitor(&cfg.monitors);
     let (img_w, img_h) = reasonable_size(&image, &monitor, &cfg.size);
-    let (win_x, win_y) = window_position(&monitor);
-    let mut wind = Window::new(win_x, win_y, img_w, img_h, "Goonto");
+
+    wind.set_size(img_w, img_h);
+
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
 
     image.scale(img_w, img_h, true, true);
