@@ -153,7 +153,6 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     wind.set_size(img_w, img_h);
 
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
-
     image.scale(img_w, img_h, true, true);
     button.set_image(Some(image));
 
@@ -298,6 +297,10 @@ fn make_window_clickthrough(handle: fltk::window::RawHandle) {
 
 // (x, y, w, h)
 fn random_monitor(rules: &Monitors) -> (i32, i32, i32, i32) {
+    // NOTE: It may appear there is a bug in the random number generation
+    // below, where the range is exclusive.
+    // This is correct behaviour because this function returns the COUNT of
+    // screens, not the maximum index.
     let screen_count = app::screen_count();
     let display = match (rules, screen_count) {
         (_, 1) => 0,
