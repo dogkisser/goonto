@@ -149,6 +149,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
         .gen_range(cfg.opacity.from..=cfg.opacity.to) as f64 / 100.;
     let (img_w, img_h) = reasonable_size(&image, &monitor, &cfg.size);
 
+    wind.set_pos(win_x - (img_w / 2), win_y - (img_h / 2));
     wind.set_size(img_w, img_h);
 
     let mut button = Button::default().with_size(img_w, img_h).center_of_parent();
