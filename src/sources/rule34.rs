@@ -80,10 +80,10 @@ fn stocktake(
 {
     tokio::runtime::Runtime::new()?.block_on(async { loop {
         if images.lock().unwrap().len() > 25 {
-            thread::sleep(Duration::from_secs(1));
+            thread::sleep(Duration::from_millis(500));
             continue;
         }
-
+        
         let url = format!("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=10&tags=sort:random -animated {} {}",
             prefix, crate::sources::random_from(tags));
 

@@ -13,8 +13,8 @@ pub struct Local {
 impl Local {
     pub fn new(cfg: &crate::Config) -> anyhow::Result<Self> {
         // This architecture is a little weird but it echoes the E6 impl
-        // With big porn folders it may take a prohibitively long time to index everything
-        // So relegate it to a thread.. I guess? :)
+        // With big porn folders it may take a prohibitively long time to index
+        // everything. So relegate it to a thread.. I guess? :)
         let (first, third) = crate::sources::get_babble(cfg);
         let r = Self {
             images: Arc::new(Mutex::new(Vec::new())),

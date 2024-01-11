@@ -81,7 +81,7 @@ fn stocktake(tags: &[String], images: &Arc<Mutex<Vec<String>>>, full_res: bool, 
 {
     tokio::runtime::Runtime::new()?.block_on(async { loop {
         if images.lock().unwrap().len() > 25 {
-            thread::sleep(Duration::from_secs(1));
+            thread::sleep(Duration::from_millis(500));
             continue;
         }
 
