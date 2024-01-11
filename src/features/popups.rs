@@ -142,7 +142,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
 
     let monitor = random_monitor(&cfg.monitors);
     let (win_x, win_y) = window_position(&monitor);
-    let mut wind = Window::new(win_x, win_y, 0, 0, "Goonto Popup");
+    let mut wind = Window::new(win_x, win_y, 100, 100, "Goonto Popup");
 
     let mut image = SharedImage::load(image_path)?;
     let opacity = rand::thread_rng()
