@@ -1,10 +1,10 @@
 # Example Goonto configuration.
 # Everything past the hash symbol (#) is a comment, and is ignored.
 
-# Everything except popups are off by default, with most other settings at sane
-# defaults.
-# So feel free to have a minimal configuration that only changes what you want
-# changed.
+# If a configuration key Goonto expects isn't listed in this file, it uses a
+# default instead, so you're welcome to create an empty goonto.yml file and
+# only customise things you'd like to change.
+# This file documents Goonto's defaults.
 
 # Whether Goonto should run automatically when your computer starts.
 run-on-boot: false
@@ -54,9 +54,9 @@ image-source:
     # individual query, i.e., every tag on a given line will be used as part of
     # the search.
     tags:
-      - ~equine ~canine dominant_feral
-      - sugarlesspaints zebra -comic
-      - zackary911
+      # - ~equine ~canine dominant_feral
+      # - sugarlesspaints zebra -comic
+      # - zackary911
 
   # Leave this empty to use web. Put a path here to use images from a folder on your
   # computer. Overrides web.
@@ -70,12 +70,12 @@ effects:
   # Popups that appear in random places on your screen.
   popups:
     enabled: true
-    rate: 1000
+    rate: 2000
     # Whether clicking a popup will close it.
     closable: true
     # How many milliseconds until the popup closes itself.
     # 0 Turns this off.
-    closes-after: 30000
+    closes-after: 0
     # How big images will be. "auto" uses an algorithm based on the resolution
     # of your display, while "any" will allow popups to be any size between
     # fairly small to as large as your entire display. Alternatively, enter a
@@ -104,40 +104,40 @@ effects:
     # Mitosis causes more popups to spawn whenever one is closed.
     mitosis:
       # Make this 0 to effectively disable mitosis
-      chance: 50
+      chance: 30
       # Maximum # of popups to open
       max: 5
     # The opacity of images
     opacity:
-      from: 50
+      from: 70
       to:   100
 
   # Discord rich presence
   discord:
     enabled: false
-    # Whether to include a link to Goonto under the description text.
+    # Whether to include a button to open Goonto's website in the embed.
     # Every time somebody turns this off, a kitten dies.
     shill: true
-    # Changes the default status text. This is the first line in the embed, the second
-    # line is controlled by the lines in babble.first-person.
-    status:
+    # Changes the default status text. This is the first line in the embed, the
+    # second line is controlled by the lines in babble.first-person.
+    status: Stroking their brains out~
 
   # Sends system notifications
   notifs:
     enabled: false
-    rate: 5000
+    rate: 15000
 
   # Automatically types for you
   typing:
     enabled: false
-    rate: 30000
+    rate: 120000
     # Whether it should press enter for you, too.
     press-enter: false
   
   # Overwrites your clipboard
   clipboard:
     enabled: false
-    rate: 5000
+    rate: 10000
 
   # Changes your wallpaper
   # When exiting Goonto cleanly (with the exit keybind), your original wallpaper

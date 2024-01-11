@@ -45,7 +45,6 @@ pub struct Popups {
     opacity: Opacity,
     mitosis: Mitosis,
     size: Size,
-    movement: Movement,
 }
 
 #[derive(Deserialize, Default)]
@@ -94,20 +93,20 @@ pub enum Size {
     Arbitrary(usize),
 }
 
-#[derive(Deserialize, Clone, Defaults)]
-#[serde(default, rename_all = "kebab-case")]
-pub struct Movement {
-    chance: usize,
-    speed: MovementSpeed,
-}
+// #[derive(Deserialize, Clone, Defaults)]
+// #[serde(default, rename_all = "kebab-case")]
+// pub struct Movement {
+//     chance: usize,
+//     speed: MovementSpeed,
+// }
 
-#[derive(Deserialize, Clone, Default)]
-#[serde(rename_all = "kebab-case")]
-pub enum MovementSpeed {
-    Fast,
-    #[default]
-    Slow,
-}
+// #[derive(Deserialize, Clone, Default)]
+// #[serde(rename_all = "kebab-case")]
+// pub enum MovementSpeed {
+//     Fast,
+//     #[default]
+//     Slow,
+// }
 
 impl Popups {
     pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {

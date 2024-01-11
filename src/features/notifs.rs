@@ -7,7 +7,7 @@ use defaults::Defaults;
 #[serde(default)]
 pub struct Notifs {
     pub enabled: bool,
-    #[def = "30_000"]
+    #[def = "15_000"]
     rate: u128,
 }
 

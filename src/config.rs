@@ -30,7 +30,7 @@ pub struct ImageSource {
 pub struct Web {
     pub booru: Booru,
     pub image_res: ImageRes,
-    #[def = "String::from(\"rating:explicit score:>300\")"]
+    #[def = "String::from(\"rating:explicit score:>200\")"]
     pub tag_prefix: String,
     pub tags: Vec<String>,
 }

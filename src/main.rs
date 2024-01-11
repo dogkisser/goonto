@@ -6,7 +6,7 @@ use std::time::Duration;
 use std::{rc::Rc, time::Instant};
 use std::path::Path;
 use fltk::app;
-use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::{HotKey, Modifiers, Code}};
+use global_hotkey::{GlobalHotKeyManager, GlobalHotKeyEvent, hotkey::HotKey};
 use log::{LevelFilter, error, info};
 #[cfg(target_os = "windows")]
 use windows::{
