@@ -10,3 +10,5 @@ mod discord;
 pub use discord::*;
 mod wallpaper;
 pub use wallpaper::*;
+mod subliminal;
+pub use subliminal::*;

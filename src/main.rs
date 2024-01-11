@@ -138,6 +138,10 @@ fn app() -> anyhow::Result<()> {
         cfg.effects.wallpaper.run(Rc::clone(&source));
     }
 
+    if cfg.effects.subliminal.enabled {
+        cfg.effects.subliminal.run(Rc::clone(&source));
+    }
+
     loop {
         let min_run_time = Duration::from_millis(cfg.minimum_run_time);
         app::wait_for(100.)?;

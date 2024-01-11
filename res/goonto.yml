@@ -112,6 +112,21 @@ effects:
       from: 70
       to:   100
 
+  # Text that appears in the centre of the screen.
+  # The text displayed is controlled by babble.third-person below.
+  subliminal:
+    enabled: true
+    # How often the text changes.
+    rate: 10000
+    # How long the text stays on screen.
+    # 0 means it will remain for the duration of the rate.
+    duration: 300
+    opacity:
+      from: 20
+      to:   50
+    # Same as popups.monitors
+    monitors: primary
+
   # Discord rich presence
   discord:
     enabled: false
