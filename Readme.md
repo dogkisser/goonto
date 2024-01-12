@@ -4,6 +4,8 @@ If you have questions, please read the [FAQ](https://github.com/zoomasochist/goo
 
 ## Building
 
+**You don't need to do this.** If you just want to _use_ Goonto, read the FAQ entry [How do I run Goonto?](https://github.com/zoomasochist/goonto/wiki/FAQ#how-do-i-run-goonto)
+
 Debug builds (`cargo build`) differ slightly from release builds (`cargo build --release`).
 Notably, you can run Goonto without elevated permissions. This may break some
 features.
