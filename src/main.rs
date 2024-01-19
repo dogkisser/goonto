@@ -49,30 +49,42 @@ fn main() {
         return
     }
 
-    if let Err(e) = Config::load() {
-        if e.is::<serde_yaml::Error>() {
-            dialog(&format!("Couldn't parse your configuration file!\n{:?}", e));
-            return
-        }
+    let _app = app::App::default();
 
-        if let Err(e) = Config::default().save() {
-            dialog(&format!("Failed to create default config file: {:?}", e));
-            return
-        }
+    // let widget_scheme = WidgetScheme::new(SchemeType::Fluent);
+    // widget_scheme.apply();
 
-        dialog("No config file was found, so a default one was created. Welcome!\n\
-               When you're done, press Control + Backspace to exit.");
-    }
+    // let widget_theme = WidgetTheme::new(ThemeType::Metro);
+    // widget_theme.apply();
 
-    if let Err(e) = app() {
+    let config = match Config::load() {
+        Ok(f) => f,
+        Err(e) => {
+            if e.is::<serde_yaml::Error>() {
+                dialog(&format!("Couldn't parse your configuration file!\n{:?}", e));
+                return
+            }
+
+            let default = Config::default();
+            if let Err(e) = default.save() {
+                dialog(&format!("Failed to create default config file: {:?}", e));
+                return
+            }
+
+            dialog("No config file was found, so a default one was created. Welcome!\n\
+                When you're done, press Control + Backspace to exit.");
+            default
+        },
+    };
+
+    if let Err(e) = app(config) {
         dialog(&format!("Something went wrong :( Please report this to {}\nMessage: {:?}",
         "https://github.com/zoomasochist/goonto/issues", e));
     }
 }
 
-fn app() -> anyhow::Result<()> {
+fn app(mut cfg: Config) -> anyhow::Result<()> {
     let started_at = Instant::now();
-    let mut cfg = Config::load()?;
 
     if cfg.save_logs {
         simplelog::WriteLogger::init(
@@ -111,8 +123,6 @@ fn app() -> anyhow::Result<()> {
     let hotkey = HotKey::from_str(&cfg.exit_keybind)?;
     info!("Parsed exit hotkey as {hotkey:?}");
     manager.register(hotkey)?;
-
-    let _app = app::App::default();
 
     if cfg.effects.popups.enabled {
         cfg.effects.popups.run(Rc::clone(&source));

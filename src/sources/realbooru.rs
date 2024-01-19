@@ -84,7 +84,7 @@ fn stocktake(
             continue;
         }
 
-        let url = format!("https://realbooru.com/index.php?page=dapi&s=post&q=index&limit=10&tags=-animated sort:random {} {}",
+        let url = format!("https://realbooru.com/index.php?page=dapi&s=post&q=index&limit=10&tags=-webm -mp4 -animated sort:random {} {}",
             prefix, crate::sources::random_from(tags));
 
         let client = reqwest::Client::new();
@@ -94,7 +94,9 @@ fn stocktake(
             .await?
             .text()
             .await?;
-        
+    
+        println!("{resp_text:?}");
+
         let parsed = serde_xml_rs::from_str::<Posts>(&resp_text)?
             .post
             .into_iter()
@@ -108,7 +110,8 @@ fn stocktake(
                 let out_path = Path::new("./goonto-cache/").join(filename);
 
                 async move {
-                    let s = client.get(&image_url)
+                    let s = client
+                        .get(&image_url)
                         .send()
                         .await?
                         .bytes()

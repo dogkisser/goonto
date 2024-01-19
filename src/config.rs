@@ -2,6 +2,7 @@ use std::fs::File;
 use serde::Deserialize;
 use anyhow::Result;
 use defaults::Defaults;
+use fltk::dialog::{self, FileDialogType};
 
 use crate::features::*;
 
@@ -76,8 +77,37 @@ pub struct Babble {
 
 impl Config {
     pub fn load() -> Result<Self> {
-        let path = std::env::current_exe().unwrap().parent().unwrap().join("goonto.yml");
-        Ok(serde_yaml::from_reader(File::open(path)?)?)
+        let bin = std::env::current_exe().unwrap();
+        let dir = bin.parent().unwrap();
+        let yml_files = std::fs::read_dir(dir)?
+            .filter(|f| f
+                    .as_ref()
+                    .unwrap()
+                    .path()
+                    .extension()
+                    .is_some_and(|e| e == "yml")
+            )
+            .map(|f| f.unwrap().path())
+            .collect::<Vec<std::path::PathBuf>>();
+        anyhow::ensure!(!yml_files.is_empty(), "No configuration files found");
+
+        if yml_files.len() == 1 {
+            return Ok(serde_yaml::from_reader(File::open(&yml_files[0])?)?);
+        }
+
+        let mut nfc = dialog::NativeFileChooser::new(FileDialogType::BrowseFile);
+        nfc.set_directory(&dir)?;
+        nfc.set_title("Choose Config file");
+        nfc.set_filter("*.yml");
+        nfc.show();
+
+        match nfc.filename() {
+            x if x.as_os_str().is_empty() => {
+                crate::dialog("You didn't choose a config file! Exiting.");
+                std::process::exit(1);
+            },
+            sel => Ok(serde_yaml::from_reader(File::open(sel)?)?),
+        }
     }
 
     pub fn save(&self) -> Result<()> {
