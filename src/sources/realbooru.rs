@@ -88,13 +88,16 @@ fn stocktake(
             prefix, crate::sources::random_from(tags));
 
         let client = reqwest::Client::new();
-        let resp_text = client
+        let resp = client
             .get(url)
             .send()
-            .await?
-            .text()
             .await?;
-    
+        let code = resp.status();
+        let resp_text = resp.text().await?;
+        anyhow::ensure!(code == reqwest::StatusCode::OK, format!(
+            "Status code != 200: {:?}", resp_text,
+        ));
+
         println!("{resp_text:?}");
 
         let parsed = serde_xml_rs::from_str::<Posts>(&resp_text)?

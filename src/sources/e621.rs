@@ -93,7 +93,12 @@ fn stocktake(tags: &[String], images: &Arc<Mutex<Vec<String>>>, full_res: bool, 
             .get(url)
             .header(reqwest::header::USER_AGENT, "Goonto/1.0.69")
             .send()
-            .await?
+            .await?;
+        anyhow::ensure!(resp.status() == reqwest::StatusCode::OK, format!(
+            "Status code != 200: {:?}", resp.text().await?,
+        ));
+
+        let resp = resp
             .json::<E6Posts>()
             .await?
             .posts;

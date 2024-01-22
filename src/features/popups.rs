@@ -94,21 +94,6 @@ pub enum Size {
     Arbitrary(usize),
 }
 
-// #[derive(Deserialize, Clone, Defaults)]
-// #[serde(default, rename_all = "kebab-case")]
-// pub struct Movement {
-//     chance: usize,
-//     speed: MovementSpeed,
-// }
-
-// #[derive(Deserialize, Clone, Default)]
-// #[serde(rename_all = "kebab-case")]
-// pub enum MovementSpeed {
-//     Fast,
-//     #[default]
-//     Slow,
-// }
-
 impl Popups {
     pub fn run<T: crate::sources::Source + 'static + ?Sized>(self, source: Rc<T>) {
         let _ = COUNT.get_or_init(|| Mutex::new(0));
@@ -144,7 +129,7 @@ fn new_popup<T: crate::sources::Source + 'static + ?Sized>(
     let (win_x, win_y) = window_position(&monitor);
     let mut wind = Window::new(win_x, win_y, 100, 100, "Goonto Popup");
 
-    let mut image = SharedImage::load(image_path);
+    let image = SharedImage::load(image_path);
 
     if image.is_err() {
         wind.end();
