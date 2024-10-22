@@ -31,7 +31,7 @@ static COUNT: OnceLock<Mutex<u64>> = OnceLock::new();
 #[derive(Deserialize, Defaults)]
 #[serde(default, rename_all = "kebab-case")]
 pub struct Popups {
-    #[def = "true"]
+    #[def = "false"]
     pub enabled: bool,
     #[def = "2_000"]
     rate: u64,
