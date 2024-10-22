@@ -69,7 +69,7 @@ image-source:
 effects:
   # Popups that appear in random places on your screen.
   popups:
-    enabled: true
+    enabled: false
     rate: 2000
     # Whether clicking a popup will close it.
     closable: true
