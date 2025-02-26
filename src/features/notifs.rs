@@ -19,6 +19,7 @@ impl Notifs {
             /* Errors ignored here.
              * If this fails I doubt there's much I can do about it
              */
+            #[cfg(not(target_os = "macos"))]
             let _ = notify_rust::Notification::new()
                 .summary("Goonto notification!")
                 .body(&source.third_person())
