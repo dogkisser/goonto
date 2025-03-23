@@ -90,6 +90,7 @@ pub enum Size {
     #[default]
     Auto,
     Any,
+    Fullscreen,
     #[serde(untagged)]
     Arbitrary(usize),
 }
@@ -337,7 +338,7 @@ fn reasonable_size(
     match config {
         Size::Auto => {
             let ratio = clamped / 3.;
-        
+
             ((img_w as f32 * ratio) as i32,
              (img_h as f32 * ratio) as i32)
         },
@@ -352,8 +353,16 @@ fn reasonable_size(
             let ratio = f32::min(
                 *max as f32 / img_w as f32,
                 *max as f32 / img_h as f32);
-            
+
            ((img_w as f32 * ratio) as i32,
+             (img_h as f32 * ratio) as i32)
+        },
+        Size::Fullscreen => {
+            let ratio = f32::min(
+                *w as f32 / img_w as f32,
+                *h as f32 / img_h as f32);
+
+            ((img_w as f32 * ratio) as i32,
              (img_h as f32 * ratio) as i32)
         },
     }

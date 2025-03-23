@@ -46,34 +46,28 @@ fn main() {
     let singleton = single_instance::SingleInstance::new("zoomasochist-goonto").unwrap();
     if !singleton.is_single() {
         dialog("Goonto is already running.");
-        return
+        return;
     }
 
     let _app = app::App::default();
-
-    // let widget_scheme = WidgetScheme::new(SchemeType::Fluent);
-    // widget_scheme.apply();
-
-    // let widget_theme = WidgetTheme::new(ThemeType::Metro);
-    // widget_theme.apply();
 
     let config = match Config::load() {
         Ok(f) => f,
         Err(e) => {
             if e.is::<serde_yaml::Error>() {
                 dialog(&format!("Couldn't parse your configuration file!\n{:?}", e));
-                return
+                return;
             }
 
             let default = Config::default();
             if let Err(e) = default.save() {
                 dialog(&format!("Failed to create default config file: {:?}", e));
-                return
+                return;
             }
 
             dialog("No config file was found, so a default one was created. Welcome!\n\
-                When you're done, press Control + Backspace to exit.");
-            default
+                You will probably want to enable popups, then start Goonto again.");
+            return;
         },
     };
 

@@ -76,12 +76,14 @@ effects:
     # How many milliseconds until the popup closes itself.
     # 0 Turns this off.
     closes-after: 0
-    # How big images will be. "auto" uses an algorithm based on the resolution
-    # of your display, while "any" will allow popups to be any size between
-    # fairly small to as large as your entire display. Alternatively, enter a
-    # number that image sizes will be clamped to.
+    # How big images will be. You can set this to:
+    # "auto": uses an algorithm based on the resolution of your display.
+    # "any":  allow popups to be any size between fairly small to as large as
+    #         your entire display.
+    # "fullscreen": always makes images as big as they can be.
+    # Or, you can write a number to which the image's size will be clamped.
     size: auto
-    # Maximum number of popups that can be open at once
+    # Maximum number of popups that can be open at once.
     # 0 == unlimited
     max: 0
     # Whether clicking on a popup clicks the popup or the window underneath it.
