@@ -43,7 +43,7 @@ pub fn dialog(msg: &str) {
 }
 
 fn main() {
-    let singleton = single_instance::SingleInstance::new("zoomasochist-goonto").unwrap();
+    let singleton = single_instance::SingleInstance::new("dogkisser-goonto").unwrap();
     if !singleton.is_single() {
         dialog("Goonto is already running.");
         return;
@@ -73,7 +73,7 @@ fn main() {
 
     if let Err(e) = app(config) {
         dialog(&format!("Something went wrong :( Please report this to {}\nMessage: {:?}",
-        "https://github.com/zoomasochist/goonto/issues", e));
+        "https://github.com/dogkisser/goonto/issues", e));
     }
 }
 
