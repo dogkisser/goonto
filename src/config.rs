@@ -65,6 +65,7 @@ pub struct Effects {
     pub clipboard: Clipboard,
     pub discord: Discord,
     pub wallpaper: Wallpaper,
+    pub repeat: RepeatDialog
 }
 
 #[derive(Deserialize, Default)]

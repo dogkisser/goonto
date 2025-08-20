@@ -67,6 +67,11 @@ image-source:
 # Most effects at least have the options "enabled" and "rate".
 # Rate is how often the effect occurs, in milliseconds.
 effects:
+  repeat:
+    enabled: true
+    rate: 20000
+    punishment: false
+
   # Popups that appear in random places on your screen.
   popups:
     enabled: false
